@@ -1,0 +1,42 @@
+﻿@using TaskAssignmentSystem.Models.Users
+@{
+    ViewData["Title"] = "Register";
+}
+<div class="container mt-4" style="max-width:540px;">
+    <h3>Register</h3>
+    <hr />
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
+    <form method="post" asp-action="Register">
+        <div class="mb-3">
+            <label class="form-label">Full Name</label>
+            <input name="fullName" class="form-control" required />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Username</label>
+            <input name="username" class="form-control" required />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input name="password" type="password" class="form-control" required />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Role</label>
+            <select name="role" class="form-select">
+                <option value="@Role.Student">Student</option>
+                <option value="@Role.Teacher">Teacher</option>
+                <option value="@Role.Admin">Admin</option>
+            </select>
+        </div>
+
+        <button class="btn btn-primary" type="submit">Register</button>
+        <a class="btn btn-link" href="/Users/Login">Already have an account? Login</a>
+    </form>
+</div>

@@ -1,0 +1,26 @@
+﻿@{
+    ViewData["Title"] = "Admin Dashboard";
+    var m = (dynamic)Model;
+}
+<div class="container mt-4">
+    <h3>Admin Dashboard</h3>
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <div class="row g-3">
+        <div class="col-md-3"><div class="card p-3"><h5>Total Users</h5><div class="display-6">@m.TotalUsers</div></div></div>
+        <div class="col-md-3"><div class="card p-3"><h5>Teachers</h5><div class="display-6">@m.TotalTeachers</div></div></div>
+        <div class="col-md-3"><div class="card p-3"><h5>Students</h5><div class="display-6">@m.TotalStudents</div></div></div>
+        <div class="col-md-3"><div class="card p-3"><h5>Active Workspaces</h5><div class="display-6">@m.ActiveWorkspaces</div></div></div>
+    </div>
+
+    <div class="mt-4">
+        <a class="btn btn-primary" href="/Admin/Workspaces">Manage Workspaces</a>
+    </div>
+</div>

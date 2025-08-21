@@ -1,0 +1,51 @@
+﻿@model TaskAssignmentSystem.Models.Workspaces.Workspace
+@inject TaskAssignmentSystem.Services.Interfaces.IAuthService Auth
+
+@{
+    ViewData["Title"] = "Workspace Details";
+    var role = Context.Session.GetString("UserRole");
+}
+<div class="container mt-4">
+    <h3>
+        Workspace: @Model.Name
+        @if (!Model.IsActive)
+        {
+            <span class="badge bg-secondary ms-2">Inactive</span>
+        }
+    </h3>
+    <p>Join Code: <code>@Model.JoinCode</code></p>
+    <hr />
+
+    <h5>Members (Students)</h5>
+    @if (Model.MemberUserIds?.Count == 0)
+    {
+        <div class="alert alert-warning">No student members yet. Share the join code!</div>
+    }
+    else
+    {
+        <table class="table table-sm">
+            <thead><tr><th>User Id</th><th>Name</th><th>Username</th><th>Role</th></tr></thead>
+            <tbody>
+                @foreach (var id in Model.MemberUserIds)
+                {
+                    var u = Auth.GetById(id);
+                    if (u != null)
+                    {
+                        <tr>
+                            <td>@u.Id</td>
+                            <td>@u.FullName</td>
+                            <td>@u.Username</td>
+                            <td>@u.Role</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    }
+
+    <a class="btn btn-secondary" href="/Workspaces">Back</a>
+    @if (role == "Admin")
+    {
+        <a class="btn btn-dark ms-2" href="/Admin/Dashboard">Admin</a>
+    }
+</div>

@@ -1,0 +1,20 @@
+﻿@{
+    ViewData["Title"] = "Join Workspace";
+}
+<div class="container mt-4" style="max-width:540px;">
+    <h3>Join Workspace by Code</h3>
+    <hr />
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <form method="post" asp-action="Join">
+        <div class="mb-3">
+            <label class="form-label">Join Code</label>
+            <input name="code" class="form-control" placeholder="Enter code e.g., ABC123" required />
+        </div>
+        <button class="btn btn-success" type="submit">Join</button>
+        <a class="btn btn-link" href="/Workspaces">Back</a>
+    </form>
+</div>

@@ -1,0 +1,27 @@
+﻿@model TaskAssignmentSystem.Models.Cpd.CpdEntry
+
+@{
+    ViewData["Title"] = "CPD Entry Details";
+}
+
+<div class="container mt-4">
+    <h2>🔍 CPD Entry Details</h2>
+    <hr />
+
+    <dl class="row">
+        <dt class="col-sm-2">Activity</dt>
+        <dd class="col-sm-10">@Model.Title</dd>
+
+        <dt class="col-sm-2">Hours</dt>
+        <dd class="col-sm-10">@Model.Hours</dd>
+
+        <dt class="col-sm-2">Date</dt>
+        <dd class="col-sm-10">@Model.Date.ToShortDateString()</dd>
+
+        <dt class="col-sm-2">Description</dt>
+        <dd class="col-sm-10">@Model.Description</dd>
+    </dl>
+
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">✏️ Edit</a>
+    <a asp-action="Index" class="btn btn-secondary">↩️ Back</a>
+</div>

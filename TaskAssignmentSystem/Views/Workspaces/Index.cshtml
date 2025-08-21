@@ -1,0 +1,50 @@
+﻿@model IEnumerable<TaskAssignmentSystem.Models.Workspaces.Workspace>
+@{
+    ViewData["Title"] = "Workspaces";
+    var role = Context.Session.GetString("UserRole");
+}
+<div class="container mt-4">
+    <h3>Workspaces</h3>
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <div class="mb-3">
+        @* Only Teacher/Admin can create *@
+        @if (role == "Teacher" || role == "Admin")
+        {
+            <a class="btn btn-primary me-2" href="/Workspaces/Create">Create Workspace</a>
+        }
+        @* Only Students can join *@
+        @if (role == "Student")
+        {
+            <a class="btn btn-outline-success" href="/Workspaces/Join">Join by Code</a>
+        }
+        @* Admin quick link *@
+        @if (role == "Admin")
+        {
+            <a class="btn btn-dark ms-2" href="/Admin/Dashboard">Admin Dashboard</a>
+        }
+    </div>
+
+
+    <table class="table table-striped">
+        <thead><tr><th>Id</th><th>Name</th><th>Join Code</th><th></th></tr></thead>
+        <tbody>
+            @foreach (var w in Model)
+            {
+                <tr>
+                    <td>@w.Id</td>
+                    <td>@w.Name</td>
+                    <td><code>@w.JoinCode</code></td>
+                    <td><a class="btn btn-sm btn-secondary" href="/Workspaces/Details/@w.Id">Details</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,21 @@
+﻿@model IEnumerable<TaskAssignmentSystem.Models.Users.User>
+@{
+    ViewData["Title"] = "Users";
+}
+<div class="container mt-4">
+    <h3>All Users</h3>
+    <table class="table table-striped">
+        <thead><tr><th>Id</th><th>Name</th><th>Username</th><th>Role</th></tr></thead>
+        <tbody>
+            @foreach (var u in Model)
+            {
+                <tr>
+                    <td>@u.Id</td>
+                    <td>@u.FullName</td>
+                    <td>@u.Username</td>
+                    <td>@u.Role</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

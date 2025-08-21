@@ -1,0 +1,62 @@
+﻿@using TaskAssignmentSystem.Models.Workspaces
+@{
+    ViewData["Title"] = "Manage Workspaces";
+    var model = (dynamic)Model;
+    List<Workspace> active = model.Active;
+    List<Workspace> inactive = model.Inactive;
+}
+<div class="container mt-4">
+    <h3>Manage Workspaces</h3>
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <h5 class="mt-3">Active</h5>
+    <table class="table table-striped">
+        <thead><tr><th>Id</th><th>Name</th><th>Join Code</th><th></th></tr></thead>
+        <tbody>
+            @foreach (var w in active)
+            {
+                <tr>
+                    <td>@w.Id</td>
+                    <td>@w.Name</td>
+                    <td><code>@w.JoinCode</code></td>
+                    <td>
+                        <form method="post" asp-action="Archive" asp-controller="Admin">
+                            <input type="hidden" name="id" value="@w.Id" />
+                            <button class="btn btn-sm btn-warning" type="submit">Archive</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <h5 class="mt-4">Inactive</h5>
+    <table class="table table-striped">
+        <thead><tr><th>Id</th><th>Name</th><th>Join Code</th><th></th></tr></thead>
+        <tbody>
+            @foreach (var w in inactive)
+            {
+                <tr>
+                    <td>@w.Id</td>
+                    <td>@w.Name</td>
+                    <td><code>@w.JoinCode</code></td>
+                    <td>
+                        <form method="post" asp-action="Restore" asp-controller="Admin">
+                            <input type="hidden" name="id" value="@w.Id" />
+                            <button class="btn btn-sm btn-success" type="submit">Restore</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <a class="btn btn-secondary" href="/Admin/Dashboard">Back to Dashboard</a>
+</div>
