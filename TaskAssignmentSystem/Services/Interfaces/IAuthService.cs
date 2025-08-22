@@ -1,4 +1,4 @@
-﻿using TaskAssignmentSystem.Models.Users;
+using TaskAssignmentSystem.Models.Users;
 
 namespace TaskAssignmentSystem.Services.Interfaces
 {
@@ -8,5 +8,8 @@ namespace TaskAssignmentSystem.Services.Interfaces
         User Login(string username, string password);
         User? GetById(int id);
         List<User> GetAll();
+        List<User> GetPending();
+        bool Approve(int userId);
+        bool SetRole(int userId, Role role);
     }
 }

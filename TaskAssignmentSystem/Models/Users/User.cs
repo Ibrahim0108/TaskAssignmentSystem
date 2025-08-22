@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace TaskAssignmentSystem.Models.Users
 {
@@ -19,5 +19,7 @@ namespace TaskAssignmentSystem.Models.Users
         public Role Role { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        public bool IsApproved { get; set; } = false;
     }
 }

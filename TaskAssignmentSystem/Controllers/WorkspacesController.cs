@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using TaskAssignmentSystem.Services.Interfaces;
 
 namespace TaskAssignmentSystem.Controllers
@@ -21,14 +21,14 @@ namespace TaskAssignmentSystem.Controllers
             return View(data);
         }
 
-        // GET: /Workspaces/Create  (Teacher/Admin only)
+        // GET: /Workspaces/Create  (Teacher only)
         [HttpGet]
         public IActionResult Create()
         {
             var role = HttpContext.Session.GetString("UserRole");
-            if (role != "Teacher" && role != "Admin")
+            if (role != "Teacher")
             {
-                TempData["Error"] = "Only Teachers or Admins can create workspaces.";
+                TempData["Error"] = "Only Teachers can create workspaces.";
                 return RedirectToAction("Index");
             }
             return View();
@@ -42,9 +42,9 @@ namespace TaskAssignmentSystem.Controllers
             var userId = HttpContext.Session.GetInt32("UserId");
             var role = HttpContext.Session.GetString("UserRole");
 
-            if (userId == null || (role != "Teacher" && role != "Admin"))
+            if (userId == null || role != "Teacher")
             {
-                TempData["Error"] = "Please login as Teacher/Admin.";
+                TempData["Error"] = "Please login as Teacher to create workspaces.";
                 return RedirectToAction("Index", "Home");
             }
             if (string.IsNullOrWhiteSpace(name))

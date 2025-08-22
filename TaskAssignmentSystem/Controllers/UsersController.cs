@@ -22,7 +22,7 @@ namespace TaskAssignmentSystem.Controllers
         // POST: /Users/Register
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Register(string username, string password, string fullName, Role role, string? joinCode)
+        public IActionResult Register(string username, string password, string fullName, Role role)
         {
             if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
             {
@@ -32,22 +32,7 @@ namespace TaskAssignmentSystem.Controllers
 
             var user = _auth.Register(username, password, fullName ?? username, role);
 
-            // If Student provided a join code, attempt to join automatically
-            if (role == Role.Student && !string.IsNullOrWhiteSpace(joinCode))
-            {
-                var ok = _workspaces.JoinByCode(joinCode.Trim(), user.Id);
-                if (!ok)
-                {
-                    TempData["Error"] = "Invalid or inactive join code. You can join later from Workspaces.";
-                }
-                else
-                {
-                    TempData["Success"] = $"User '{user.Username}' registered and joined workspace successfully. Please login.";
-                    return RedirectToAction("Login");
-                }
-            }
-
-            TempData["Success"] = $"User '{user.Username}' registered as {user.Role}. Please login.";
+            TempData["Success"] = $"User '{user.Username}' registered as {user.Role}. Please wait for admin approval before logging in.";
             return RedirectToAction("Login");
         }
 
@@ -64,6 +49,13 @@ namespace TaskAssignmentSystem.Controllers
             if (user == null)
             {
                 TempData["Error"] = "Invalid credentials.";
+                return View();
+            }
+
+            // Check approval status
+            if (!user.IsApproved)
+            {
+                TempData["Error"] = "Your account is pending admin approval.";
                 return View();
             }
 

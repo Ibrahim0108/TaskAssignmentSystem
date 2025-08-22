@@ -13,9 +13,9 @@ namespace TaskAssignmentSystem.Services.Implementations
         public AuthService()
         {
             // Seed some demo users so you can test immediately
-            _users.Add(new User { Id = _nextId++, Username = "admin", PasswordHash = HashPassword("admin123"), FullName = "System Admin", Role = Role.Admin });
-            _users.Add(new User { Id = _nextId++, Username = "teacher", PasswordHash = HashPassword("teach123"), FullName = "Ms. Sharma", Role = Role.Teacher });
-            _users.Add(new User { Id = _nextId++, Username = "student", PasswordHash = HashPassword("stud123"), FullName = "Anjali K", Role = Role.Student });
+            _users.Add(new User { Id = _nextId++, Username = "admin", PasswordHash = HashPassword("admin123"), FullName = "System Admin", Role = Role.Admin, IsApproved = true });
+            _users.Add(new User { Id = _nextId++, Username = "teacher", PasswordHash = HashPassword("teach123"), FullName = "Ms. Sharma", Role = Role.Teacher, IsApproved = true });
+            _users.Add(new User { Id = _nextId++, Username = "student", PasswordHash = HashPassword("stud123"), FullName = "Anjali K", Role = Role.Student, IsApproved = false });
         }
 
         public User Register(string username, string password, string fullName, Role role)
@@ -26,7 +26,8 @@ namespace TaskAssignmentSystem.Services.Implementations
                 Username = username,
                 PasswordHash = HashPassword(password),
                 FullName = fullName,
-                Role = role
+                Role = role,
+                IsApproved = false
             };
             _users.Add(user);
             return user;
@@ -41,6 +42,24 @@ namespace TaskAssignmentSystem.Services.Implementations
         public User? GetById(int id) => _users.FirstOrDefault(u => u.Id == id);
 
         public List<User> GetAll() => _users;
+
+        public List<User> GetPending() => _users.Where(u => !u.IsApproved).ToList();
+
+        public bool Approve(int userId)
+        {
+            var u = GetById(userId);
+            if (u == null) return false;
+            u.IsApproved = true;
+            return true;
+        }
+
+        public bool SetRole(int userId, Role role)
+        {
+            var u = GetById(userId);
+            if (u == null) return false;
+            u.Role = role;
+            return true;
+        }
 
         private static string HashPassword(string password)
         {
