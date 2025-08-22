@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using TaskAssignmentSystem.Models.Users;
 using TaskAssignmentSystem.Services.Interfaces;
 
@@ -7,10 +7,12 @@ namespace TaskAssignmentSystem.Controllers
     public class UsersController : Controller
     {
         private readonly IAuthService _auth;
+        private readonly IWorkspaceService _workspaces;
 
-        public UsersController(IAuthService auth)
+        public UsersController(IAuthService auth, IWorkspaceService workspaces)
         {
             _auth = auth;
+            _workspaces = workspaces;
         }
 
         // GET: /Users/Register
@@ -20,7 +22,7 @@ namespace TaskAssignmentSystem.Controllers
         // POST: /Users/Register
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Register(string username, string password, string fullName, Role role)
+        public IActionResult Register(string username, string password, string fullName, Role role, string? joinCode)
         {
             if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
             {
@@ -29,6 +31,22 @@ namespace TaskAssignmentSystem.Controllers
             }
 
             var user = _auth.Register(username, password, fullName ?? username, role);
+
+            // If Student provided a join code, attempt to join automatically
+            if (role == Role.Student && !string.IsNullOrWhiteSpace(joinCode))
+            {
+                var ok = _workspaces.JoinByCode(joinCode.Trim(), user.Id);
+                if (!ok)
+                {
+                    TempData["Error"] = "Invalid or inactive join code. You can join later from Workspaces.";
+                }
+                else
+                {
+                    TempData["Success"] = $"User '{user.Username}' registered and joined workspace successfully. Please login.";
+                    return RedirectToAction("Login");
+                }
+            }
+
             TempData["Success"] = $"User '{user.Username}' registered as {user.Role}. Please login.";
             return RedirectToAction("Login");
         }
