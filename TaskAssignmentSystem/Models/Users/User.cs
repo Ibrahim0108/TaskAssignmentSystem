@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace TaskAssignmentSystem.Models.Users
 {
@@ -19,5 +20,18 @@ namespace TaskAssignmentSystem.Models.Users
         public Role Role { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        // ✅ Add this property for pending approvals
+        public bool IsApproved { get; set; } = false;
+    }
+}
+
+namespace TaskAssignmentSystem.Models.Users
+{
+    public enum Role
+    {
+        Admin = 1,
+        Teacher = 2,
+        Student = 3
     }
 }

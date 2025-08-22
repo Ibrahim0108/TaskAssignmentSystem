@@ -17,7 +17,12 @@ namespace TaskAssignmentSystem.Controllers
         // GET: /Workspaces (show ACTIVE only to everyone)
         public IActionResult Index()
         {
-            var data = _workspaces.GetActive();
+            var role = HttpContext.Session.GetString("UserRole");
+            if (role == "Admin" || role == "Teacher")
+            {
+                return RedirectToAction("Workspaces", "Admin");
+            }
+            var data = _workspaces.GetActive(); // Students see active only
             return View(data);
         }
 

@@ -87,5 +87,80 @@ namespace TaskAssignmentSystem.Controllers
             TempData[ok ? "Success" : "Error"] = ok ? "Workspace restored." : "Unable to restore.";
             return RedirectToAction("Workspaces");
         }
+
+        // POST: /Admin/Deactivate/5 (Workspace owner)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Deactivate(int id)
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                TempData["Error"] = "You must be logged in to deactivate a workspace.";
+                return RedirectToAction("Workspaces");
+            }
+
+            var ws = _workspaces.GetById(id);
+            if (ws == null || ws.CreatedByUserId != userId.Value)
+            {
+                TempData["Error"] = "You do not have permission to deactivate this workspace.";
+                return RedirectToAction("Workspaces");
+            }
+
+            var ok = _workspaces.Archive(id);
+            TempData[ok ? "Success" : "Error"] = ok ? "Workspace deactivated." : "Unable to deactivate.";
+            return RedirectToAction("Workspaces");
+        }
+
+        // GET: /Admin/PendingUsers
+        public IActionResult PendingUsers()
+        {
+            if (!IsAdmin())
+            {
+                TempData["Error"] = "Admin only.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            var pendingUsers = _auth.GetPendingUsers();
+            return View(pendingUsers);
+        }
+
+        // POST: /Admin/Approve/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Approve(int id)
+        {
+            if (!IsAdmin())
+            {
+                TempData["Error"] = "Admin only.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            var ok = _auth.ApproveUser(id);
+            TempData[ok ? "Success" : "Error"] = ok ? "User approved." : "Unable to approve user.";
+            return RedirectToAction("PendingUsers");
+        }
+
+        // POST: /Admin/Reject/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Reject(int id)
+        {
+            if (!IsAdmin())
+            {
+                TempData["Error"] = "Admin only.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            var ok = _auth.RejectUser(id);
+            TempData[ok ? "Success" : "Error"] = ok ? "User rejected." : "Unable to reject user.";
+            return RedirectToAction("PendingUsers");
+        }
+
+        // Optional Index redirect to Dashboard
+        public IActionResult Index()
+        {
+            return RedirectToAction("Dashboard");
+        }
     }
 }

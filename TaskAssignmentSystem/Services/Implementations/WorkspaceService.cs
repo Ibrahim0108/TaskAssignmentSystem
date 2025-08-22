@@ -24,16 +24,10 @@ namespace TaskAssignmentSystem.Services.Implementations
         }
 
         public List<Workspace> GetAll() => _workspaces;
-
         public List<Workspace> GetActive() => _workspaces.Where(w => w.IsActive).ToList();
-
         public List<Workspace> GetInactive() => _workspaces.Where(w => !w.IsActive).ToList();
-
         public Workspace? GetById(int id) => _workspaces.FirstOrDefault(w => w.Id == id);
-
-        public Workspace? GetByJoinCode(string code) =>
-            _workspaces.FirstOrDefault(w => w.JoinCode.Equals(code, StringComparison.OrdinalIgnoreCase));
-
+        public Workspace? GetByJoinCode(string code) => _workspaces.FirstOrDefault(w => w.JoinCode.Equals(code, StringComparison.OrdinalIgnoreCase));
         public bool JoinByCode(string code, int userId)
         {
             var ws = GetByJoinCode(code);
@@ -42,7 +36,6 @@ namespace TaskAssignmentSystem.Services.Implementations
                 ws.MemberUserIds.Add(userId);
             return true;
         }
-
         public bool Archive(int id)
         {
             var ws = GetById(id);
@@ -50,7 +43,6 @@ namespace TaskAssignmentSystem.Services.Implementations
             ws.IsActive = false;
             return true;
         }
-
         public bool Restore(int id)
         {
             var ws = GetById(id);

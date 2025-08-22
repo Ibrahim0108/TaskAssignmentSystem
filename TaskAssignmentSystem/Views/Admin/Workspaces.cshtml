@@ -4,7 +4,11 @@
     var model = (dynamic)Model;
     List<Workspace> active = model.Active;
     List<Workspace> inactive = model.Inactive;
+
+    var isAdmin = Context.Session.GetString("UserRole") == "Admin";
+    var userId = Context.Session.GetInt32("UserId");
 }
+
 <div class="container mt-4">
     <h3>Manage Workspaces</h3>
     @if (TempData["Success"] != null)
@@ -16,9 +20,9 @@
         <div class="alert alert-danger">@TempData["Error"]</div>
     }
 
-    <h5 class="mt-3">Active</h5>
+    <h5 class="mt-3">Active Workspaces</h5>
     <table class="table table-striped">
-        <thead><tr><th>Id</th><th>Name</th><th>Join Code</th><th></th></tr></thead>
+        <thead><tr><th>Id</th><th>Name</th><th>Join Code</th><th>Action</th></tr></thead>
         <tbody>
             @foreach (var w in active)
             {
@@ -27,19 +31,27 @@
                     <td>@w.Name</td>
                     <td><code>@w.JoinCode</code></td>
                     <td>
-                        <form method="post" asp-action="Archive" asp-controller="Admin">
-                            <input type="hidden" name="id" value="@w.Id" />
-                            <button class="btn btn-sm btn-warning" type="submit">Archive</button>
-                        </form>
+                        @if (w.CreatedByUserId == userId)
+                        {
+                            <form method="post" asp-action="Deactivate" asp-controller="Admin">
+                                <input type="hidden" name="id" value="@w.Id" />
+                                <button class="btn btn-warning btn-sm" type="submit">Deactivate</button>
+                            </form>
+                        }
+                        else
+                        {
+
+                            <span>N/A</span>
+                        }
                     </td>
                 </tr>
             }
         </tbody>
     </table>
 
-    <h5 class="mt-4">Inactive</h5>
+    <h5 class="mt-4">Inactive Workspaces</h5>
     <table class="table table-striped">
-        <thead><tr><th>Id</th><th>Name</th><th>Join Code</th><th></th></tr></thead>
+        <thead><tr><th>Id</th><th>Name</th><th>Join Code</th><th>Action</th></tr></thead>
         <tbody>
             @foreach (var w in inactive)
             {
@@ -48,10 +60,18 @@
                     <td>@w.Name</td>
                     <td><code>@w.JoinCode</code></td>
                     <td>
-                        <form method="post" asp-action="Restore" asp-controller="Admin">
-                            <input type="hidden" name="id" value="@w.Id" />
-                            <button class="btn btn-sm btn-success" type="submit">Restore</button>
-                        </form>
+                        @if (isAdmin)
+                        {
+                            <form method="post" asp-action="Restore" asp-controller="Admin">
+                                <input type="hidden" name="id" value="@w.Id" />
+                                <button class="btn btn-success btn-sm" type="submit">Restore</button>
+                            </form>
+                        }
+                        else
+                        {
+
+                            <span>N/A</span>
+                        }
                     </td>
                 </tr>
             }
