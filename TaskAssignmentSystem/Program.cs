@@ -23,9 +23,11 @@ builder.Services.AddSession(options =>
 // Our app services (in-memory for Phase 1)
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddSingleton<IWorkspaceService, WorkspaceService>();
-
 // (You already had these; keep if you need demo TaskService)
 builder.Services.AddScoped<ITaskService, TaskService>();
+
+// Phase 2: Teams
+builder.Services.AddSingleton<ITeamService, TeamService>();
 
 var app = builder.Build();
 

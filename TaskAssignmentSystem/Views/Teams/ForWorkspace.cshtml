@@ -1,0 +1,43 @@
+@model List<TaskAssignmentSystem.Models.Teams.Team>
+@{
+    var ws = ViewBag.Workspace as TaskAssignmentSystem.Models.Workspaces.Workspace;
+    var role = Context.Session.GetString("UserRole");
+}
+<div class="container mt-4">
+    <h3>Teams in @ws!.Name</h3>
+    <p>Workspace Id: @ws.Id</p>
+    <hr />
+
+    @if (role == "Teacher" || role == "Admin")
+    {
+        <a class="btn btn-primary" href="/Teams/Create?workspaceId=@ws.Id">Create Team</a>
+    }
+    <a class="btn btn-outline-secondary ms-2" href="/Workspaces/Details/@ws.Id">Back to Workspace</a>
+
+    <div class="mt-3">
+        @if (!Model.Any())
+        {
+            <div class="alert alert-info">No teams yet.</div>
+        }
+        else
+        {
+            <table class="table table-striped">
+                <thead><tr><th>Id</th><th>Name</th><th>Join Code</th><th>Leader</th><th>Members</th><th>Status</th><th></th></tr></thead>
+                <tbody>
+                @foreach (var t in Model)
+                {
+                    <tr>
+                        <td>@t.Id</td>
+                        <td>@t.Name</td>
+                        <td><code>@t.JoinCode</code></td>
+                        <td>@t.LeaderUserId</td>
+                        <td>@t.MemberUserIds.Count</td>
+                        <td>@(t.IsSubmitted ? $"Submitted @ {t.SubmittedAt}" : "In Progress")</td>
+                        <td><a class="btn btn-sm btn-secondary" href="/Teams/Details/@t.Id">Details</a></td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>

@@ -1,0 +1,23 @@
+@{
+    ViewData["Title"] = "Join Team";
+}
+<div class="container mt-4" style="max-width:520px;">
+    <h3>Join Team</h3>
+    <hr />
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    <form method="post" asp-action="Join">
+        <div class="mb-3">
+            <label class="form-label">Team Join Code</label>
+            <input name="code" class="form-control" required />
+        </div>
+        <button class="btn btn-primary" type="submit">Join</button>
+        <a class="btn btn-link" href="/Workspaces">Back</a>
+    </form>
+</div>

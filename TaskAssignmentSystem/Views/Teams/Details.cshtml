@@ -1,0 +1,91 @@
+@model TaskAssignmentSystem.Models.Teams.Team
+@inject TaskAssignmentSystem.Services.Interfaces.IAuthService Auth
+@{
+    var role = Context.Session.GetString("UserRole");
+    var userId = Context.Session.GetInt32("UserId");
+}
+<div class="container mt-4">
+    <h3>Team: @Model.Name</h3>
+    <p>Join Code: <code>@Model.JoinCode</code></p>
+    <p>Leader User Id: @Model.LeaderUserId</p>
+    <p>Status: @(Model.IsSubmitted ? $"Submitted @ {Model.SubmittedAt}" : "In Progress")</p>
+    <hr />
+
+    <h5>Members</h5>
+    @if (!Model.MemberUserIds.Any())
+    {
+        <div class="alert alert-warning">No members yet.</div>
+    }
+    else
+    {
+        <ul>
+            @foreach (var id in Model.MemberUserIds)
+            {
+                var u = Auth.GetById(id);
+                if (u != null)
+                {
+                    <li>@u.FullName (@u.Username) - @u.Role</li>
+                }
+            }
+        </ul>
+    }
+
+    <h5 class="mt-3">Updates</h5>
+    @if (!Model.Updates.Any())
+    {
+        <div class="alert alert-info">No updates yet.</div>
+    }
+    else
+    {
+        <table class="table table-sm">
+            <thead><tr><th>When</th><th>By</th><th>Content</th><th>Reviewed</th><th></th></tr></thead>
+            <tbody>
+            @foreach (var u in Model.Updates.OrderByDescending(x => x.CreatedAt))
+            {
+                var user = Auth.GetById(u.UserId);
+                <tr>
+                    <td>@u.CreatedAt.ToLocalTime()</td>
+                    <td>@(user != null ? user.FullName : $"User {u.UserId}")</td>
+                    <td>@u.Content</td>
+                    <td>@(u.ReviewedByLeader ? "Yes" : "No")</td>
+                    <td>
+                        @if (userId == Model.LeaderUserId && !u.ReviewedByLeader)
+                        {
+                            <form method="post" asp-action="LeaderReview">
+                                <input type="hidden" name="teamId" value="@Model.Id" />
+                                <input type="hidden" name="updateId" value="@u.Id" />
+                                <button class="btn btn-sm btn-outline-success" type="submit">Mark Reviewed</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+
+    @if (userId != null && Model.MemberUserIds.Contains(userId.Value) && !Model.IsSubmitted)
+    {
+        <div class="card mt-3">
+            <div class="card-body">
+                <form method="post" asp-action="AddUpdate">
+                    <input type="hidden" name="teamId" value="@Model.Id" />
+                    <div class="mb-2">
+                        <textarea name="content" class="form-control" rows="3" placeholder="Share your progress..." required></textarea>
+                    </div>
+                    <button class="btn btn-primary btn-sm" type="submit">Add Update</button>
+                </form>
+            </div>
+        </div>
+    }
+
+    @if (userId == Model.LeaderUserId && !Model.IsSubmitted)
+    {
+        <form class="mt-3" method="post" asp-action="Submit">
+            <input type="hidden" name="teamId" value="@Model.Id" />
+            <button class="btn btn-danger" type="submit">Submit To Teacher</button>
+        </form>
+    }
+
+    <a class="btn btn-outline-secondary mt-3" href="/Teams/ForWorkspace/@Model.WorkspaceId">Back</a>
+</div>

@@ -1,4 +1,4 @@
-﻿@model TaskAssignmentSystem.Models.Workspaces.Workspace
+@model TaskAssignmentSystem.Models.Workspaces.Workspace
 @inject TaskAssignmentSystem.Services.Interfaces.IAuthService Auth
 
 @{
@@ -15,6 +15,14 @@
     </h3>
     <p>Join Code: <code>@Model.JoinCode</code></p>
     <hr />
+
+    <div class="mb-3">
+        <a class="btn btn-outline-primary" href="/Teams/ForWorkspace/@Model.Id">View Teams</a>
+        @if (role == "Student" || role == "Teacher")
+        {
+            <a class="btn btn-outline-success ms-2" href="/Teams/Join">Join a Team</a>
+        }
+    </div>
 
     <h5>Members (Students)</h5>
     @if (Model.MemberUserIds?.Count == 0)
