@@ -1,0 +1,65 @@
+@using TaskAssignmentSystem.Models.Users
+@{
+    ViewData["Title"] = "Manage Users";
+    var model = (dynamic)Model;
+    var pending = model.Pending as List<User>;
+    var all = model.All as List<User>;
+}
+<div class="container mt-4">
+    <h3>Manage Users</h3>
+    <hr />
+
+    <h5>Pending Approval</h5>
+    @if (pending == null || pending.Count == 0)
+    {
+        <div class="alert alert-info">No pending users.</div>
+    }
+    else
+    {
+        <table class="table table-striped table-sm">
+            <thead><tr><th>Id</th><th>Name</th><th>Username</th><th>Requested Role</th><th></th></tr></thead>
+            <tbody>
+            @foreach (var u in pending!)
+            {
+                <tr>
+                    <td>@u.Id</td><td>@u.FullName</td><td>@u.Username</td><td>@u.Role</td>
+                    <td>
+                        <form class="d-inline" method="post" asp-action="Approve">
+                            <input type="hidden" name="id" value="@u.Id" />
+                            <button class="btn btn-sm btn-success" type="submit">Approve</button>
+                        </form>
+                        <form class="d-inline" method="post" asp-action="SetRole">
+                            <input type="hidden" name="id" value="@u.Id" />
+                            <select name="role" class="form-select form-select-sm d-inline w-auto">
+                                <option value="@Role.Student">Student</option>
+                                <option value="@Role.Teacher">Teacher</option>
+                                <option value="@Role.Admin">Admin</option>
+                            </select>
+                            <button class="btn btn-sm btn-secondary" type="submit">Set Role</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+
+    <h5 class="mt-4">All Users</h5>
+    <table class="table table-sm">
+        <thead><tr><th>Id</th><th>Name</th><th>Username</th><th>Role</th><th>Approved</th></tr></thead>
+        <tbody>
+        @foreach (var u in all!)
+        {
+            <tr>
+                <td>@u.Id</td>
+                <td>@u.FullName</td>
+                <td>@u.Username</td>
+                <td>@u.Role</td>
+                <td>@(u.IsApproved ? "Yes" : "No")</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+
+    <a class="btn btn-outline-secondary" href="/Admin/Dashboard">Back</a>
+</div>
