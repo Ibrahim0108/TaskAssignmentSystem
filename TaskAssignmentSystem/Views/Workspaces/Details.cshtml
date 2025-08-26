@@ -1,59 +1,78 @@
 @model TaskAssignmentSystem.Models.Workspaces.Workspace
 @inject TaskAssignmentSystem.Services.Interfaces.IAuthService Auth
+@using Microsoft.AspNetCore.Http
 
 @{
     ViewData["Title"] = "Workspace Details";
+    ViewData["ActiveNav"] = "Workspaces";
     var role = Context.Session.GetString("UserRole");
+    var userId = Context.Session.GetInt32("UserId");
 }
-<div class="container mt-4">
-    <h3>
-        Workspace: @Model.Name
+<div class="card p-3 mt-2">
+    <div class="d-flex align-items-center">
+        <h3 class="mb-0">Workspace: @Model.Name</h3>
         @if (!Model.IsActive)
         {
             <span class="badge bg-secondary ms-2">Inactive</span>
         }
-    </h3>
-    <p>Join Code: <code>@Model.JoinCode</code></p>
+        <div class="ms-auto">
+            <a class="btn btn-outline-secondary btn-sm" href="@Url.Action("Index", "Workspaces")">Back</a>
+            @if (role == "Admin")
+            {
+                <a class="btn btn-dark btn-sm ms-2" href="@Url.Action("Dashboard", "Admin")">Admin</a>
+            }
+            @if (role == "Teacher" || role == "Admin")
+            {
+                <a class="btn btn-warning btn-sm ms-2" asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
+            }
+        </div>
+    </div>
+    <p class="mt-2">Join Code: <code>@Model.JoinCode</code></p>
     <hr />
 
-    <div class="mb-3">
-        <a class="btn btn-outline-primary" href="/Teams/ForWorkspace/@Model.Id">View Teams</a>
-        @if (role == "Student" || role == "Teacher")
+
+    <div class="mb-3 d-flex gap-2">
+        @if (Model.IsTeamBased)
         {
-            <a class="btn btn-outline-success ms-2" href="/Teams/Join">Join a Team</a>
+            if (role == "Teacher")
+            {
+                <a class="btn btn-outline-primary" href="@Url.Action("Create", "Teams", new { workspaceId = Model.Id })">Create Team</a>
+                <a class="btn btn-outline-success" href="@Url.Action("Join", "Teams", new { workspaceId = Model.Id })">Join Team</a>
+            }
+            else if (role == "Student")
+            {
+                <a class="btn btn-outline-success" href="@Url.Action("Join", "Teams", new { workspaceId = Model.Id })">Join Team</a>
+            }
         }
+
     </div>
 
     <h5>Members (Students)</h5>
-    @if (Model.MemberUserIds?.Count == 0)
+    @if (Model.MemberUserIds == null || Model.MemberUserIds.Count == 0)
     {
         <div class="alert alert-warning">No student members yet. Share the join code!</div>
     }
     else
     {
-        <table class="table table-sm">
-            <thead><tr><th>User Id</th><th>Name</th><th>Username</th><th>Role</th></tr></thead>
-            <tbody>
-                @foreach (var id in Model.MemberUserIds)
-                {
-                    var u = Auth.GetById(id);
-                    if (u != null)
+        <div class="table-responsive">
+            <table class="table table-sm table-hover align-middle">
+                <thead><tr><th>User Id</th><th>Name</th><th>Username</th><th>Role</th></tr></thead>
+                <tbody>
+                    @foreach (var id in Model.MemberUserIds)
                     {
-                        <tr>
-                            <td>@u.Id</td>
-                            <td>@u.FullName</td>
-                            <td>@u.Username</td>
-                            <td>@u.Role</td>
-                        </tr>
+                        var u = Auth.GetById(id);   
+                        if (u != null)
+                        {
+                            <tr>
+                                <td>@u.Id</td>
+                                <td>@u.FullName</td>
+                                <td>@u.Username</td>
+                                <td>@u.Role</td>
+                            </tr>
+                        }
                     }
-                }
-            </tbody>
-        </table>
-    }
-
-    <a class="btn btn-secondary" href="/Workspaces">Back</a>
-    @if (role == "Admin")
-    {
-        <a class="btn btn-dark ms-2" href="/Admin/Dashboard">Admin</a>
+                </tbody>
+            </table>
+        </div>
     }
 </div>

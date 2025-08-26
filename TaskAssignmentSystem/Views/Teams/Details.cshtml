@@ -5,7 +5,23 @@
     var userId = Context.Session.GetInt32("UserId");
 }
 <div class="container mt-4">
-    <h3>Team: @Model.Name</h3>
+    <div class="d-flex align-items-center">
+        <h3 class="mb-0">Team: @Model.Name</h3>
+        <div class="ms-auto">
+            @if (role == "Teacher" || role == "Admin")
+            {
+                <a class="btn btn-warning btn-sm me-2" asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
+                <form method="post" asp-action="Delete" asp-route-id="@Model.Id" style="display:inline;">
+                    <button type="submit" class="btn btn-danger btn-sm"
+                            onclick="return confirm('Are you sure you want to delete this team?');">
+                        Delete
+                    </button>
+                </form>
+            }
+            <a class="btn btn-outline-secondary btn-sm ms-2" href="/Teams/ForWorkspace/@Model.WorkspaceId">Back</a>
+        </div>
+    </div>
+
     <p>Join Code: <code>@Model.JoinCode</code></p>
     <p>Leader User Id: @Model.LeaderUserId</p>
     <p>Status: @(Model.IsSubmitted ? $"Submitted @ {Model.SubmittedAt}" : "In Progress")</p>
@@ -40,26 +56,26 @@
         <table class="table table-sm">
             <thead><tr><th>When</th><th>By</th><th>Content</th><th>Reviewed</th><th></th></tr></thead>
             <tbody>
-            @foreach (var u in Model.Updates.OrderByDescending(x => x.CreatedAt))
-            {
-                var user = Auth.GetById(u.UserId);
-                <tr>
-                    <td>@u.CreatedAt.ToLocalTime()</td>
-                    <td>@(user != null ? user.FullName : $"User {u.UserId}")</td>
-                    <td>@u.Content</td>
-                    <td>@(u.ReviewedByLeader ? "Yes" : "No")</td>
-                    <td>
-                        @if (userId == Model.LeaderUserId && !u.ReviewedByLeader)
-                        {
-                            <form method="post" asp-action="LeaderReview">
-                                <input type="hidden" name="teamId" value="@Model.Id" />
-                                <input type="hidden" name="updateId" value="@u.Id" />
-                                <button class="btn btn-sm btn-outline-success" type="submit">Mark Reviewed</button>
-                            </form>
-                        }
-                    </td>
-                </tr>
-            }
+                @foreach (var u in Model.Updates.OrderByDescending(x => x.CreatedAt))
+                {
+                    var user = Auth.GetById(u.UserId);
+                    <tr>
+                        <td>@u.CreatedAt.ToLocalTime()</td>
+                        <td>@(user != null ? user.FullName : $"User {u.UserId}")</td>
+                        <td>@u.Content</td>
+                        <td>@(u.ReviewedByLeader ? "Yes" : "No")</td>
+                        <td>
+                            @if (userId == Model.LeaderUserId && !u.ReviewedByLeader)
+                            {
+                                <form method="post" asp-action="LeaderReview">
+                                    <input type="hidden" name="teamId" value="@Model.Id" />
+                                    <input type="hidden" name="updateId" value="@u.Id" />
+                                    <button class="btn btn-sm btn-outline-success" type="submit">Mark Reviewed</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
             </tbody>
         </table>
     }

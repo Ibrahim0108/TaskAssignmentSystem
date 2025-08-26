@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using TaskAssignmentSystem.Models.Users;
 using TaskAssignmentSystem.Services.Interfaces;
 
 namespace TaskAssignmentSystem.Controllers
@@ -7,11 +8,13 @@ namespace TaskAssignmentSystem.Controllers
     {
         private readonly ITeamService _teams;
         private readonly IWorkspaceService _workspaces;
+        private readonly IAuthService _auth;
 
-        public TeamsController(ITeamService teams, IWorkspaceService workspaces)
+        public TeamsController(ITeamService teams, IWorkspaceService workspaces, IAuthService auth)
         {
             _teams = teams;
             _workspaces = workspaces;
+            _auth = auth;  // <-- initialize
         }
 
         // GET: /Teams/ForWorkspace/5
@@ -29,15 +32,34 @@ namespace TaskAssignmentSystem.Controllers
         [HttpGet]
         public IActionResult Create(int workspaceId)
         {
-            var role = HttpContext.Session.GetString("UserRole");
-            if (role != "Teacher" && role != "Admin")
-            {
-                TempData["Error"] = "Only Teachers/Admins can create teams.";
-                return RedirectToAction("ForWorkspace", new { id = workspaceId });
-            }
+            var ws = _workspaces.GetById(workspaceId);
+            if (ws == null) return NotFound();
+
+            // get department and year for this workspace (department comes from teacher who created workspace)
+            var details = _workspaces.GetWorkspaceDetails(workspaceId);
+            string? department = details.Department;
+            int? year = details.Year;
+
+            // get eligible teachers (same department as workspace creator)
+            var teachers = _auth.GetAll()
+                .Where(u => u.Role == Role.Teacher && u.Department == department)
+                .ToList();
+
+            // get eligible students (same department AND same year)
+            var students = _auth.GetAll()
+                .Where(u => u.Role == Role.Student && u.Department == department && u.Year == year)
+                .ToList();
+
+            ViewBag.Teachers = teachers;
+            ViewBag.Students = students;
             ViewBag.WorkspaceId = workspaceId;
+            ViewBag.Workspace = ws;
             return View();
         }
+
+
+
+
 
         // POST: /Teams/Create
         [HttpPost]
@@ -168,5 +190,51 @@ namespace TaskAssignmentSystem.Controllers
             TempData[ok ? "Success" : "Error"] = ok ? "Team submitted to teacher." : "Only leader can submit.";
             return RedirectToAction("Details", new { id = teamId });
         }
+
+        // inside TeamsController.cs
+
+        [HttpGet]
+        public IActionResult Edit(int id)
+        {
+            var t = _teams.GetById(id);
+            if (t == null) return NotFound();
+            return View(t);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(int id, string name, int leaderUserId)
+        {
+            var t = _teams.GetById(id);
+            if (t == null) return NotFound();
+
+            t.Name = name;
+            t.LeaderUserId = leaderUserId;
+            _teams.Update(t);
+
+            TempData["Success"] = "Team updated successfully.";
+            return RedirectToAction("Details", new { id = id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Delete(int id)
+        {
+            var ok = _teams.Delete(id);
+            TempData[ok ? "Success" : "Error"] = ok ? "Team deleted." : "Error deleting team.";
+            return RedirectToAction("ForWorkspace", new { id = ok ? id : 0 });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult RemoveMember(int teamId, int userId)
+        {
+            var ok = _teams.RemoveMember(teamId, userId);
+            TempData[ok ? "Success" : "Error"] = ok ? "Member removed." : "Error removing member.";
+            return RedirectToAction("Details", new { id = teamId });
+        }
+
+
+
     }
 }

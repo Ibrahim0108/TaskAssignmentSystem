@@ -1,20 +1,19 @@
 ﻿@{
     ViewData["Title"] = "Join Workspace";
+    ViewData["ActiveNav"] = "Workspaces";
 }
-<div class="container mt-4" style="max-width:540px;">
-    <h3>Join Workspace by Code</h3>
-    <hr />
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert alert-danger">@TempData["Error"]</div>
-    }
-
-    <form method="post" asp-action="Join">
-        <div class="mb-3">
-            <label class="form-label">Join Code</label>
-            <input name="code" class="form-control" placeholder="Enter code e.g., ABC123" required />
+<div class="row justify-content-center">
+    <div class="col-md-7 col-lg-6">
+        <div class="card p-4 mt-3">
+            <h3 class="mb-3">Join workspace by code</h3>
+            <form asp-action="Join" asp-controller="Workspaces" method="post">
+                <div class="mb-3">
+                    <label class="form-label">Join Code</label>
+                    <input name="code" class="form-control" required maxlength="12" placeholder="ABC123" />
+                </div>
+                <button class="btn btn-primary" type="submit">Join</button>
+                <a class="btn btn-outline-secondary ms-2" href="@Url.Action("Index", "Workspaces")">Back</a>
+            </form>
         </div>
-        <button class="btn btn-success" type="submit">Join</button>
-        <a class="btn btn-link" href="/Workspaces">Back</a>
-    </form>
+    </div>
 </div>

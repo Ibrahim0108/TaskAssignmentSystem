@@ -1,21 +1,34 @@
 ﻿@model IEnumerable<TaskAssignmentSystem.Models.Users.User>
 @{
-    ViewData["Title"] = "Users";
+    ViewData["Title"] = "All Users";
 }
-<div class="container mt-4">
-    <h3>All Users</h3>
-    <table class="table table-striped">
-        <thead><tr><th>Id</th><th>Name</th><th>Username</th><th>Role</th></tr></thead>
-        <tbody>
-            @foreach (var u in Model)
-            {
+<h3>All Users</h3>
+<div class="card p-3">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
                 <tr>
-                    <td>@u.Id</td>
-                    <td>@u.FullName</td>
-                    <td>@u.Username</td>
-                    <td>@u.Role</td>
+                    <th>Id</th>
+                    <th>Username</th>
+                    <th>Full Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Approved</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var user in Model)
+                {
+                    <tr>
+                        <td>@user.Id</td>
+                        <td>@user.Username</td>
+                        <td>@user.FullName</td>
+                        <td>@user.Email</td>
+                        <td><span class="badge bg-secondary">@user.Role</span></td>
+                        <td>@(user.IsApproved ? "Yes" : "No")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>

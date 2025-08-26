@@ -82,5 +82,34 @@ namespace TaskAssignmentSystem.Services.Implementations
             var rand = new Random();
             return new string(Enumerable.Range(0, len).Select(_ => Alphabet[rand.Next(Alphabet.Length)]).ToArray());
         }
+
+        public bool Update(Team team)
+        {
+            var existing = GetById(team.Id);
+            if (existing == null) return false;   // must return here
+
+            existing.Name = team.Name;
+            existing.LeaderUserId = team.LeaderUserId;
+            return true;  // return true when update succeeds
+        }
+
+
+        public bool Delete(int id)
+        {
+            var t = GetById(id);
+            if (t == null) return false;
+            _teams.Remove(t);
+            return true;
+        }
+
+        public bool RemoveMember(int teamId, int userId)
+        {
+            var t = GetById(teamId);
+            if (t == null) return false;
+            return t.MemberUserIds.Remove(userId);
+        }
+
+
+
     }
 }

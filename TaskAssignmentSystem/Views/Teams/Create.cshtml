@@ -1,29 +1,61 @@
 @{
-    ViewData["Title"] = "Create Team";
-    var workspaceId = (int)ViewBag.WorkspaceId;
+    var workspaceId = ViewBag.WorkspaceId;
+    var teachers = ViewBag.Teachers as List<TaskAssignmentSystem.Models.Users.User>;
+    var students = ViewBag.Students as List<TaskAssignmentSystem.Models.Users.User>;
 }
-<div class="container mt-4" style="max-width:560px;">
-    <h3>Create Team</h3>
-    <hr />
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert alert-danger">@TempData["Error"]</div>
-    }
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success">@TempData["Success"]</div>
-    }
-    <form method="post" asp-action="Create">
-        <input type="hidden" name="workspaceId" value="@workspaceId" />
-        <div class="mb-3">
-            <label class="form-label">Team Name</label>
-            <input name="name" class="form-control" required />
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Leader User Id</label>
-            <input name="leaderUserId" type="number" class="form-control" placeholder="Enter user id of leader" required />
-        </div>
-        <button class="btn btn-primary" type="submit">Create</button>
-        <a class="btn btn-link" href="/Teams/ForWorkspace/@workspaceId">Cancel</a>
-    </form>
-</div>
+
+<form method="post" asp-action="Create">
+    <input type="hidden" name="workspaceId" value="@workspaceId" />
+    <div class="mb-3">
+        <label class="form-label">Team Name</label>
+        <input name="name" class="form-control" required />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Leader Type</label>
+        <select name="leaderType" class="form-select" id="leaderType">
+            <option value="Teacher">Teacher</option>
+            <option value="Student">Student</option>
+        </select>
+    </div>
+
+    <div class="mb-3" id="teacherDropdown">
+        <label class="form-label">Select Teacher</label>
+        <select name="leaderUserId" class="form-select">
+            @foreach (var t in teachers)
+            {
+                <option value="@t.Id">@t.FullName (@t.Username)</option>
+            }
+        </select>
+    </div>
+
+    <div class="mb-3" id="studentDropdown" style="display:none;">
+        <label class="form-label">Select Student</label>
+        <select name="leaderUserId" class="form-select">
+            @foreach (var s in students)
+            {
+                <option value="@s.Id">@s.FullName (@s.Username)</option>
+            }
+        </select>
+    </div>
+
+    <button class="btn btn-primary" type="submit">Create</button>
+</form>
+
+@section Scripts {
+    <script>
+        var leaderType = document.getElementById('leaderType');
+        var teacherDiv = document.getElementById('teacherDropdown');
+        var studentDiv = document.getElementById('studentDropdown');
+
+        leaderType.addEventListener('change', function(){
+            if(this.value === 'Teacher'){
+                teacherDiv.style.display='block';
+                studentDiv.style.display='none';
+            } else {
+                teacherDiv.style.display='none';
+                studentDiv.style.display='block';
+            }
+        });
+    </script>
+}

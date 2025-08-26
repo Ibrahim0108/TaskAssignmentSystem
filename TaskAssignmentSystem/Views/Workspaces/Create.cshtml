@@ -1,20 +1,37 @@
 ﻿@{
     ViewData["Title"] = "Create Workspace";
+    ViewData["ActiveNav"] = "CreateWorkspace";
 }
-<div class="container mt-4" style="max-width:540px;">
-    <h3>Create Workspace</h3>
-    <hr />
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert alert-danger">@TempData["Error"]</div>
-    }
+<div class="row justify-content-center">
+    <div class="col-md-7 col-lg-6">
+        <div class="card p-4 mt-3">
+            <h3 class="mb-3">Create a new workspace</h3>
+            <form asp-action="Create" asp-controller="Workspaces" method="post">
+                <div class="mb-3">
+                    <label class="form-label">Workspace Name</label>
+                    <input name="name" class="form-control" required maxlength="100" />
+                </div>
 
-    <form method="post" asp-action="Create">
-        <div class="mb-3">
-            <label class="form-label">Workspace Name</label>
-            <input name="name" class="form-control" required />
+                <!-- New Year field -->
+                <div class="mb-3">
+                    <label class="form-label">Year</label>
+                    <select name="year" class="form-select" required>
+                        <option value="">-- Select Year --</option>
+                        <option value="1">1st Year</option>
+                        <option value="2">2nd Year</option>
+                        <option value="3">3rd Year</option>
+                        <option value="4">4th Year</option>
+                    </select>
+                </div>
+
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" name="isTeamBased" value="true" id="isTeamBased">
+                    <label class="form-check-label" for="isTeamBased">This workspace is team-based</label>
+                </div>
+
+                <button class="btn btn-primary" type="submit">Create</button>
+                <a class="btn btn-outline-secondary ms-2" href="@Url.Action("Index", "Workspaces")">Cancel</a>
+            </form>
         </div>
-        <button class="btn btn-primary" type="submit">Create</button>
-        <a class="btn btn-link" href="/Workspaces">Back</a>
-    </form>
+    </div>
 </div>

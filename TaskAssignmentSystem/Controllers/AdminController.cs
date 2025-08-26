@@ -1,213 +1,203 @@
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
+using TaskAssignmentSystem.Data;
 using TaskAssignmentSystem.Models.Users;
-using TaskAssignmentSystem.Services.Interfaces;
 
 namespace TaskAssignmentSystem.Controllers
 {
     public class AdminController : Controller
     {
-        private readonly IAuthService _auth;
-        private readonly IWorkspaceService _workspaces;
+        private readonly ApplicationDbContext _context;
 
-        public AdminController(IAuthService auth, IWorkspaceService workspaces)
+        public AdminController(ApplicationDbContext context)
         {
-            _auth = auth;
-            _workspaces = workspaces;
+            _context = context;
         }
 
+        // ✅ Only Admin is the top guy now
         private bool IsAdmin()
         {
             return HttpContext.Session.GetString("UserRole") == "Admin";
         }
 
-        // GET: /Admin/Dashboard
         public IActionResult Dashboard()
         {
             if (!IsAdmin())
             {
                 TempData["Error"] = "Admin only.";
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Login", "Auth");
             }
 
-            var users = _auth.GetAll();
-            var activeWs = _workspaces.GetActive();
-            var inactiveWs = _workspaces.GetInactive();
+            var totalUsers = _context.Users.Count();
+            var totalTeachers = _context.Users.Count(u => u.Role == Role.Teacher);
+            var totalStudents = _context.Users.Count(u => u.Role == Role.Student);
+            var pendingUsers = _context.Users.Count(u => !u.IsApproved);
 
-            var model = new
+            // if you don’t have workspaces yet, keep these 0 or adjust later
+            var activeWorkspaces = 0;
+            var inactiveWorkspaces = 0;
+
+            var dashboardData = new
             {
-                TotalUsers = users.Count,
-                TotalTeachers = users.Count(u => u.Role.ToString() == "Teacher"),
-                TotalStudents = users.Count(u => u.Role.ToString() == "Student"),
-                ActiveWorkspaces = activeWs.Count,
-                InactiveWorkspaces = inactiveWs.Count,
-                PendingUsers = _auth.GetPending().Count
+                TotalUsers = totalUsers,
+                TotalTeachers = totalTeachers,
+                TotalStudents = totalStudents,
+                PendingUsers = pendingUsers,
+                ActiveWorkspaces = activeWorkspaces,
+                InactiveWorkspaces = inactiveWorkspaces
             };
 
-            return View(model);
+            return View(dashboardData);
         }
 
-        // GET: /Admin/Users (manage approvals)
+
+        // ✅ Show all users
         public IActionResult Users()
         {
             if (!IsAdmin())
             {
                 TempData["Error"] = "Admin only.";
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Dashboard");
             }
-            var pending = _auth.GetPending();
-            var all = _auth.GetAll();
-            var model = new { Pending = pending, All = all };
+
+            var pending = _context.Users.Where(u => !u.IsApproved).ToList();
+            var all = _context.Users.ToList();
+
+            var model = new
+            {
+                Pending = pending,
+                All = all
+            };
+
             return View(model);
         }
 
-        // POST: /Admin/Approve/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Approve(int id)
+
+        // ✅ Approve pending users
+        public IActionResult Pending()
         {
             if (!IsAdmin())
             {
                 TempData["Error"] = "Admin only.";
-                return RedirectToAction("Index", "Home");
-            }
-            var ok = _auth.Approve(id);
-            TempData[ok ? "Success" : "Error"] = ok ? "User approved." : "Unable to approve.";
-            return RedirectToAction("Users");
-        }
-
-        // POST: /Admin/SetRole
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult SetRole(int id, Role role)
-        {
-            if (!IsAdmin())
-            {
-                TempData["Error"] = "Admin only.";
-                return RedirectToAction("Index", "Home");
-            }
-            var ok = _auth.SetRole(id, role);
-            TempData[ok ? "Success" : "Error"] = ok ? "Role updated." : "Unable to update role.";
-            return RedirectToAction("Users");
-        }
-
-        // Existing workspace overview endpoints remain read-only for Admin
-        // GET: /Admin/Workspaces
-        public IActionResult Workspaces()
-        {
-            if (!IsAdmin())
-            {
-                TempData["Error"] = "Admin only.";
-                return RedirectToAction("Index", "Home");
-            }
-            var active = _workspaces.GetActive();
-            var inactive = _workspaces.GetInactive();
-            var model = new { Active = active, Inactive = inactive };
-            return View(model);
-        }
-
-        // POST: /Admin/Archive/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Archive(int id)
-        {
-            if (!IsAdmin())
-            {
-                TempData["Error"] = "Admin only.";
-                return RedirectToAction("Index", "Home");
-            }
-            var ok = _workspaces.Archive(id);
-            TempData[ok ? "Success" : "Error"] = ok ? "Workspace archived." : "Unable to archive.";
-            return RedirectToAction("Workspaces");
-        }
-
-        // POST: /Admin/Restore/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Restore(int id)
-        {
-            if (!IsAdmin())
-            {
-                TempData["Error"] = "Admin only.";
-                return RedirectToAction("Index", "Home");
-            }
-            var ok = _workspaces.Restore(id);
-            TempData[ok ? "Success" : "Error"] = ok ? "Workspace restored." : "Unable to restore.";
-            return RedirectToAction("Workspaces");
-        }
-
-        // POST: /Admin/Deactivate/5 (Workspace owner)
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Deactivate(int id)
-        {
-            var userId = HttpContext.Session.GetInt32("UserId");
-            if (userId == null)
-            {
-                TempData["Error"] = "You must be logged in to deactivate a workspace.";
-                return RedirectToAction("Workspaces");
+                return RedirectToAction("Dashboard");
             }
 
-            var ws = _workspaces.GetById(id);
-            if (ws == null || ws.CreatedByUserId != userId.Value)
-            {
-                TempData["Error"] = "You do not have permission to deactivate this workspace.";
-                return RedirectToAction("Workspaces");
-            }
-
-            var ok = _workspaces.Archive(id);
-            TempData[ok ? "Success" : "Error"] = ok ? "Workspace deactivated." : "Unable to deactivate.";
-            return RedirectToAction("Workspaces");
-        }
-
-        // GET: /Admin/PendingUsers
-        public IActionResult PendingUsers()
-        {
-            if (!IsAdmin())
-            {
-                TempData["Error"] = "Admin only.";
-                return RedirectToAction("Index", "Home");
-            }
-
-            var pendingUsers = _auth.GetPendingUsers();
+            var pendingUsers = _context.Users.Where(u => !u.IsApproved).ToList();
             return View(pendingUsers);
         }
 
-        // POST: /Admin/Approve/5
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public IActionResult Approve(int id)
         {
             if (!IsAdmin())
             {
                 TempData["Error"] = "Admin only.";
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Dashboard");
             }
 
-            var ok = _auth.ApproveUser(id);
-            TempData[ok ? "Success" : "Error"] = ok ? "User approved." : "Unable to approve user.";
-            return RedirectToAction("PendingUsers");
+            var user = _context.Users.FirstOrDefault(u => u.Id == id);
+            if (user != null)
+            {
+                user.IsApproved = true;
+                _context.SaveChanges();
+                TempData["Success"] = $"{user.Username} approved.";
+            }
+
+            return RedirectToAction("Pending");
         }
 
-        // POST: /Admin/Reject/5
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public IActionResult Reject(int id)
         {
             if (!IsAdmin())
             {
                 TempData["Error"] = "Admin only.";
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Dashboard");
             }
 
-            var ok = _auth.RejectUser(id);
-            TempData[ok ? "Success" : "Error"] = ok ? "User rejected." : "Unable to reject user.";
-            return RedirectToAction("PendingUsers");
+            var user = _context.Users.FirstOrDefault(u => u.Id == id);
+            if (user != null)
+            {
+                _context.Users.Remove(user);
+                _context.SaveChanges();
+                TempData["Success"] = $"{user.Username} rejected and deleted.";
+            }
+
+            return RedirectToAction("Pending");
         }
 
-        // Optional Index redirect to Dashboard
-        public IActionResult Index()
+
+
+        // ✅ Change role of user
+        [HttpPost]
+        public IActionResult SetRole(int id, string role)
         {
-            return RedirectToAction("Dashboard");
+            if (!IsAdmin())
+            {
+                TempData["Error"] = "Admin only.";
+                return RedirectToAction("Dashboard");
+            }
+
+            var user = _context.Users.FirstOrDefault(u => u.Id == id);
+            if (user != null)
+            {
+                if (Enum.TryParse(role, out Role parsedRole))
+                {
+                    user.Role = parsedRole;
+                    _context.SaveChanges();
+                    TempData["Success"] = $"Role updated for {user.Username}.";
+                }
+                else
+                {
+                    TempData["Error"] = "Invalid role.";
+                }
+            }
+
+            return RedirectToAction("Users");
         }
+
+        // ✅ Delete a user
+        [HttpPost]
+        public IActionResult Delete(int id)
+        {
+            if (!IsAdmin())
+            {
+                TempData["Error"] = "Admin only.";
+                return RedirectToAction("Dashboard");
+            }
+
+            var user = _context.Users.FirstOrDefault(u => u.Id == id);
+            if (user != null)
+            {
+                _context.Users.Remove(user);
+                _context.SaveChanges();
+                TempData["Success"] = $"{user.Username} deleted.";
+            }
+
+            return RedirectToAction("Users");
+        }
+
+        public IActionResult Workspaces()
+        {
+            if (!IsAdmin())
+            {
+                TempData["Error"] = "Admin only.";
+                return RedirectToAction("Dashboard");
+            }
+
+            var active = _context.Workspaces.Where(w => w.IsActive).ToList();
+            var inactive = _context.Workspaces.Where(w => !w.IsActive).ToList();
+
+
+            var model = new
+            {
+                Active = active,
+                Inactive = inactive
+            };
+
+            return View(model);
+        }
+
     }
 }

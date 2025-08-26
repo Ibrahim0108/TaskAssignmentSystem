@@ -7,24 +7,14 @@
 
     @if (ViewBag.CurrentUserName == null)
     {
-        <a class="btn btn-primary me-2" href="/Users/Login">Login</a>
-        <a class="btn btn-outline-secondary" href="/Users/Register">Register</a>
+        
     }
     else
     {
         <div class="alert alert-success">
             Logged in as <strong>@ViewBag.CurrentUserName</strong> (@ViewBag.CurrentUserRole)
         </div>
-        <a class="btn btn-secondary me-2" href="/Users/Logout">Logout</a>
-        <a class="btn btn-primary me-2" href="/Workspaces">Workspaces</a>
-        @if ((string)ViewBag.CurrentUserRole == "Teacher")
-        {
-            <a class="btn btn-outline-success" href="/Workspaces/Create">Create Workspace</a>
-        }
-        @if ((string)ViewBag.CurrentUserRole == "Admin")
-        {
-            <a class="btn btn-dark" href="/Admin/Dashboard">Admin Dashboard</a>
-        }
+       
     }
 
 </div>

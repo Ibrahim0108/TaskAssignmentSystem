@@ -12,5 +12,9 @@ namespace TaskAssignmentSystem.Services.Interfaces
         TeamProgressUpdate AddUpdate(int teamId, int userId, string content);
         bool LeaderReviewUpdate(int teamId, int updateId, int leaderUserId);
         bool SubmitTeam(int teamId, int leaderUserId);
+        bool Update(Team team);
+        bool Delete(int id);
+        bool RemoveMember(int teamId, int userId);
+
     }
 }

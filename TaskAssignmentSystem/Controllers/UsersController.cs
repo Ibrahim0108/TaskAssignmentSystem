@@ -15,14 +15,12 @@ namespace TaskAssignmentSystem.Controllers
             _workspaces = workspaces;
         }
 
-        // GET: /Users/Register
         [HttpGet]
         public IActionResult Register() => View();
 
-        // POST: /Users/Register
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Register(string username, string password, string fullName, Role role)
+        public IActionResult Register(string username, string password, string fullName, Role role, string email, string department, int? year, string section)
         {
             if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
             {
@@ -30,17 +28,22 @@ namespace TaskAssignmentSystem.Controllers
                 return View();
             }
 
-            var user = _auth.Register(username, password, fullName ?? username, role);
+            if (role == Role.Student && year == null)
+            {
+                TempData["Error"] = "Year is required for students.";
+                return View();
+            }
+
+            var user = _auth.Register(username, password, fullName ?? username, role, email, department, year, section);
 
             TempData["Success"] = $"User '{user.Username}' registered as {user.Role}. Please wait for admin approval before logging in.";
             return RedirectToAction("Login");
         }
 
-        // GET: /Users/Login
+
         [HttpGet]
         public IActionResult Login() => View();
 
-        // POST: /Users/Login
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Login(string username, string password)
@@ -52,14 +55,12 @@ namespace TaskAssignmentSystem.Controllers
                 return View();
             }
 
-            // Check approval status
             if (!user.IsApproved)
             {
                 TempData["Error"] = "Your account is pending admin approval.";
                 return View();
             }
 
-            // store user in session
             HttpContext.Session.SetInt32("UserId", user.Id);
             HttpContext.Session.SetString("UserName", user.FullName);
             HttpContext.Session.SetString("UserRole", user.Role.ToString());
@@ -68,7 +69,6 @@ namespace TaskAssignmentSystem.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        // GET: /Users/Logout
         [HttpGet]
         public IActionResult Logout()
         {
@@ -77,7 +77,6 @@ namespace TaskAssignmentSystem.Controllers
             return RedirectToAction("Login");
         }
 
-        // GET: /Users/Index (list all users - admin/teacher overview)
         [HttpGet]
         public IActionResult Index()
         {

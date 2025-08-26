@@ -1,0 +1,63 @@
+﻿@model IEnumerable<TaskAssignmentSystem.Models.Users.User>
+
+@{
+    ViewData["Title"] = "Pending Approvals";
+    ViewData["ActiveNav"] = "AdminUsers";
+}
+
+<h3 class="mb-3">Pending Approvals</h3>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-success">No pending users 🎉</div>
+}
+else
+{
+    <div class="card p-3 shadow-sm animate__animated animate__fadeIn">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Id</th>
+                        <th>Username</th>
+                        <th>Full Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model)
+                    {
+                        <tr class="table-warning">
+                            <td>@user.Id</td>
+                            <td>@user.Username</td>
+                            <td>@user.FullName</td>
+                            <td>@user.Email</td>
+                            <td>
+                                <span class="badge bg-warning-subtle text-dark">@user.Role</span>
+                            </td>
+                            <td>
+                                <form asp-action="Approve" asp-controller="Admin" method="post" class="d-inline">
+                                    <input type="hidden" name="id" value="@user.Id" />
+                                    <button class="btn btn-sm btn-success">
+                                        <i class="bi bi-check-circle"></i> Approve
+                                    </button>
+                                </form>
+                                <form asp-action="Reject" asp-controller="Admin" method="post" class="d-inline">
+                                    <input type="hidden" name="id" value="@user.Id" />
+                                    <button class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-x-circle"></i> Reject
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <a class="btn btn-secondary mt-2" href="@Url.Action("Dashboard", "Admin")">
+            <i class="bi bi-arrow-left"></i> Back
+        </a>
+    </div>
+}

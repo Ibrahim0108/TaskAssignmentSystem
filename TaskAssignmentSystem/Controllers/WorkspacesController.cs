@@ -14,19 +14,12 @@ namespace TaskAssignmentSystem.Controllers
             _auth = auth;
         }
 
-        // GET: /Workspaces (show ACTIVE only to everyone)
         public IActionResult Index()
         {
-            var role = HttpContext.Session.GetString("UserRole");
-            if (role == "Admin" || role == "Teacher")
-            {
-                return RedirectToAction("Workspaces", "Admin");
-            }
-            var data = _workspaces.GetActive(); // Students see active only
+            var data = _workspaces.GetActive();
             return View(data);
         }
 
-        // GET: /Workspaces/Create  (Teacher only)
         [HttpGet]
         public IActionResult Create()
         {
@@ -39,10 +32,9 @@ namespace TaskAssignmentSystem.Controllers
             return View();
         }
 
-        // POST: /Workspaces/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(string name)
+        public IActionResult Create(string name, int year, bool isTeamBased)
         {
             var userId = HttpContext.Session.GetInt32("UserId");
             var role = HttpContext.Session.GetString("UserRole");
@@ -58,12 +50,44 @@ namespace TaskAssignmentSystem.Controllers
                 return View();
             }
 
-            var ws = _workspaces.Create(name, userId.Value);
+            var ws = _workspaces.Create(name, year, userId.Value, isTeamBased);
             TempData["Success"] = $"Workspace '{ws.Name}' created. Join Code: {ws.JoinCode}";
             return RedirectToAction("Details", new { id = ws.Id });
         }
 
-        // GET: /Workspaces/Join  (Students only)
+        [HttpGet]
+        public IActionResult Edit(int id)
+        {
+            var ws = _workspaces.GetById(id);
+            if (ws == null) return NotFound();
+            return View(ws);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(int id, string name, int year, bool isTeamBased)
+        {
+            var ws = _workspaces.GetById(id);
+            if (ws == null) return NotFound();
+
+            ws.Name = name;
+            ws.Year = year;
+            ws.IsTeamBased = isTeamBased;
+            _workspaces.Update(ws);
+
+            TempData["Success"] = "Workspace updated successfully.";
+            return RedirectToAction("Details", new { id = id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult MarkInactive(int id)
+        {
+            var ok = _workspaces.Archive(id);
+            TempData[ok ? "Success" : "Error"] = ok ? "Workspace marked inactive." : "Error archiving workspace.";
+            return RedirectToAction("Index");
+        }
+
         [HttpGet]
         public IActionResult Join()
         {
@@ -76,7 +100,6 @@ namespace TaskAssignmentSystem.Controllers
             return View();
         }
 
-        // POST: /Workspaces/Join
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Join(string code)
@@ -107,7 +130,6 @@ namespace TaskAssignmentSystem.Controllers
             return RedirectToAction("Index");
         }
 
-        // GET: /Workspaces/Details/5
         [HttpGet]
         public IActionResult Details(int id)
         {

@@ -19,19 +19,18 @@ namespace TaskAssignmentSystem.Models.Users
         [Required]
         public Role Role { get; set; }
 
+        [Required, EmailAddress]
+        public string Email { get; set; }
+
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         // ✅ Add this property for pending approvals
         public bool IsApproved { get; set; } = false;
+
+        public string? Department { get; set; }  // Teacher department / Student stream
+        public int? Year { get; set; }           // Only used for students
+        public string? Section { get; set; }    // Optional for students
     }
 }
 
-namespace TaskAssignmentSystem.Models.Users
-{
-    public enum Role
-    {
-        Admin = 1,
-        Teacher = 2,
-        Student = 3
-    }
-}
+

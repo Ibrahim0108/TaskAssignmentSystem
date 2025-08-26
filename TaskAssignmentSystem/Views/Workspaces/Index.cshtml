@@ -1,50 +1,101 @@
 ﻿@model IEnumerable<TaskAssignmentSystem.Models.Workspaces.Workspace>
+@using Microsoft.AspNetCore.Http
 @{
     ViewData["Title"] = "Workspaces";
+    ViewData["ActiveNav"] = "Workspaces";
     var role = Context.Session.GetString("UserRole");
-}
-<div class="container mt-4">
-    <h3>Workspaces</h3>
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success">@TempData["Success"]</div>
-    }
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert alert-danger">@TempData["Error"]</div>
-    }
+    var isTeacher = role == "Teacher";
+    var isStudentOrTeacher = role == "Student" || role == "Teacher";
+    var isStudent = role == "Student";
+    var isAdmin = role == "Admin";
 
-    <div class="mb-3">
-        @* Only Teacher/Admin can create *@
-        @if (role == "Teacher" || role == "Admin")
+    string msg;
+    if (isAdmin)
+    {
+        msg = "No workspaces yet.";
+    }
+    else if (isTeacher)
+    {
+        msg = "Create one!";
+    }
+    else // student
+    {
+        msg = "Ask your teacher for a join code.";
+    }
+}
+<div class="d-flex align-items-center mb-3">
+    <h3 class="mb-0">Active Workspaces</h3>
+    <div class="ms-auto d-flex gap-2">
+        @if (isTeacher)
         {
-            <a class="btn btn-primary me-2" href="/Workspaces/Create">Create Workspace</a>
+            <a class="btn btn-primary" href="@Url.Action("Create", "Workspaces")">Create Workspace</a>
         }
-        @* Only Students can join *@
-        @if (role == "Student")
+        @if (isStudent)
         {
-            <a class="btn btn-outline-success" href="/Workspaces/Join">Join by Code</a>
-        }
-        @* Admin quick link *@
-        @if (role == "Admin")
-        {
-            <a class="btn btn-dark ms-2" href="/Admin/Dashboard">Admin Dashboard</a>
+            <a class="btn btn-outline-secondary" href="@Url.Action("Join", "Workspaces")">Join by Code</a>
         }
     </div>
-
-
-    <table class="table table-striped">
-        <thead><tr><th>Id</th><th>Name</th><th>Join Code</th><th></th></tr></thead>
-        <tbody>
-            @foreach (var w in Model)
-            {
-                <tr>
-                    <td>@w.Id</td>
-                    <td>@w.Name</td>
-                    <td><code>@w.JoinCode</code></td>
-                    <td><a class="btn btn-sm btn-secondary" href="/Workspaces/Details/@w.Id">Details</a></td>
-                </tr>
-            }
-        </tbody>
-    </table>
 </div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">@msg</div>
+}
+else
+{
+    <div class="card p-3">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr><th>Id</th><th>Name</th><th>Join Code</th><th>Status</th><th></th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var w in Model)
+                    {
+                        <tr>
+                            <td>@w.Id</td>
+                            <td>@w.Name</td>
+                            <td><code>@w.JoinCode</code></td>
+                            <td>
+                                @if (w.IsActive)
+                                {
+                                    <span class="badge bg-success">Active</span>
+                                }
+                                else
+                                {
+
+                                    <span class="badge bg-secondary">Inactive</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <a class="btn btn-sm btn-outline-primary" href="@Url.Action("Details", "Workspaces", new { id = w.Id })">Details</a>
+                            </td>
+                            <td class="text-end">
+                                
+
+                                @if (isTeacher || isAdmin)
+                                {
+                                  
+
+                                    @if (w.IsActive)
+                                    {
+                                        <form method="post" asp-action="Inactivate" asp-route-id="@w.Id" style="display:inline;">
+                                            <button type="submit" class="btn btn-sm btn-secondary">Inactivate</button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <form method="post" asp-action="Restore" asp-route-id="@w.Id" style="display:inline;">
+                                            <button type="submit" class="btn btn-sm btn-success">Restore</button>
+                                        </form>
+                                    }
+                                }
+                            </td>
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

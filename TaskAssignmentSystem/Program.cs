@@ -1,14 +1,13 @@
 using TaskAssignmentSystem.Models.Config;
 using TaskAssignmentSystem.Services.Interfaces;
 using TaskAssignmentSystem.Services.Implementations;
+using Microsoft.EntityFrameworkCore;
+using TaskAssignmentSystem.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 // ?? Bind AppSettings section from appsettings.json
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
-
-
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -20,22 +19,24 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-// Our app services (in-memory for Phase 1)
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddSingleton<IWorkspaceService, WorkspaceService>();
-// (You already had these; keep if you need demo TaskService)
-builder.Services.AddScoped<ITaskService, TaskService>();
+// Database
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(connectionString));
 
-// Phase 2: Teams
-builder.Services.AddSingleton<ITeamService, TeamService>();
+// App services
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IWorkspaceService, WorkspaceService>();
+builder.Services.AddScoped<ITaskService, TaskService>();
+builder.Services.AddScoped<ITeamService, TeamService>();
 
 var app = builder.Build();
+
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-    
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 

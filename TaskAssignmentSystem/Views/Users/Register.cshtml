@@ -1,42 +1,105 @@
 @using TaskAssignmentSystem.Models.Users
 @{
     ViewData["Title"] = "Register";
+    ViewData["ActiveNav"] = "Register";
 }
-<div class="container mt-4" style="max-width:540px;">
-    <h3>Register</h3>
-    <hr />
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert alert-danger">@TempData["Error"]</div>
-    }
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success">@TempData["Success"]</div>
-    }
 
-    <form method="post" asp-action="Register">
-        <div class="mb-3">
-            <label class="form-label">Full Name</label>
-            <input name="fullName" class="form-control" required />
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Username</label>
-            <input name="username" class="form-control" required />
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Password</label>
-            <input name="password" type="password" class="form-control" required />
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Role</label>
-            <select name="role" class="form-select">
-                <option value="@Role.Student">Student</option>
-                <option value="@Role.Teacher">Teacher</option>
-                <option value="@Role.Admin">Admin</option>
-            </select>
-        </div>
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card p-4 mt-4">
+            <h3 class="mb-3 text-center">Create your account</h3>
+            <p class="text-muted text-center">Students are auto-approved. Teachers/Admins require admin approval.</p>
 
-        <button class="btn btn-primary" type="submit">Register</button>
-        <a class="btn btn-link" href="/Users/Login">Already have an account? Login</a>
-    </form>
+            <form asp-action="Register" asp-controller="Users" method="post">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Username</label>
+                        <input name="username" class="form-control" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Full Name</label>
+                        <input name="fullName" class="form-control" required />
+                    </div>
+                    <div class="col-12">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Password</label>
+                        <input name="password" type="password" class="form-control" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Role</label>
+                        <select name="role" class="form-select" id="roleSelect" required>
+                            <option value="@Role.Admin">Admin</option>
+                            <option value="@Role.Teacher">Teacher</option>
+                            <option value="@Role.Student">Student</option>
+                        </select>
+                    </div>
+
+                    <!-- Fields for student or teacher -->
+                    <div id="studentTeacherFields" class="row">
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label">Department / Stream</label>
+                            <input name="department" class="form-control" />
+                        </div>
+                        <div class="col-md-6" id="yearField">
+                            <label class="form-label">Year</label>
+                            <input name="year" type="number" class="form-control" min="1" max="4" placeholder="(Students only)" />
+                        </div>
+                        <div class="col-md-6" id="sectionField">
+                            <label class="form-label">Section</label>
+                            <input name="section" class="form-control" placeholder="(optional)" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-3">
+                    <button class="btn btn-primary" type="submit">Create account</button>
+                </div>
+            </form>
+
+            <div class="text-center mt-3">
+                <small class="text-muted">Already have an account?</small>
+                <a href="@Url.Action("Login", "Users")" class="ms-1">Login</a>
+            </div>
+        </div>
+    </div>
 </div>
+
+@section Scripts {
+    <script>
+        const roleSelect = document.getElementById('roleSelect');
+        const studentTeacherFields = document.getElementById('studentTeacherFields');
+        const yearField = document.getElementById('yearField');
+        const sectionField = document.getElementById('sectionField');
+
+        function updateFields() {
+            const role = roleSelect.value;
+            if(role === '@Role.Student') {
+                studentTeacherFields.style.display = 'flex';
+                yearField.style.display = 'block';
+                sectionField.style.display = 'block';
+                studentTeacherFields.querySelector('input[name="department"]').required = true;
+                studentTeacherFields.querySelector('input[name="year"]').required = true;
+            }
+            else if(role === '@Role.Teacher') {
+                studentTeacherFields.style.display = 'flex';
+                yearField.style.display = 'none';
+                sectionField.style.display = 'none';
+                studentTeacherFields.querySelector('input[name="department"]').required = true;
+                studentTeacherFields.querySelector('input[name="year"]').required = false;
+            }
+            else {
+                // Admin
+                studentTeacherFields.style.display = 'none';
+                studentTeacherFields.querySelector('input[name="department"]').required = false;
+                studentTeacherFields.querySelector('input[name="year"]').required = false;
+            }
+        }
+
+        roleSelect.addEventListener('change', updateFields);
+        window.addEventListener('load', updateFields);
+    </script>
+}

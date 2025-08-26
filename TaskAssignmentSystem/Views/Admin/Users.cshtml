@@ -1,65 +1,102 @@
 @using TaskAssignmentSystem.Models.Users
 @{
     ViewData["Title"] = "Manage Users";
-    var model = (dynamic)Model;
-    var pending = model.Pending as List<User>;
-    var all = model.All as List<User>;
+    ViewData["ActiveNav"] = "AdminUsers";
+    dynamic m = Model;
 }
-<div class="container mt-4">
-    <h3>Manage Users</h3>
-    <hr />
+<h3 class="mb-3">Manage Users</h3>
 
-    <h5>Pending Approval</h5>
-    @if (pending == null || pending.Count == 0)
-    {
-        <div class="alert alert-info">No pending users.</div>
-    }
-    else
-    {
-        <table class="table table-striped table-sm">
-            <thead><tr><th>Id</th><th>Name</th><th>Username</th><th>Requested Role</th><th></th></tr></thead>
-            <tbody>
-            @foreach (var u in pending!)
-            {
-                <tr>
-                    <td>@u.Id</td><td>@u.FullName</td><td>@u.Username</td><td>@u.Role</td>
-                    <td>
-                        <form class="d-inline" method="post" asp-action="Approve">
-                            <input type="hidden" name="id" value="@u.Id" />
-                            <button class="btn btn-sm btn-success" type="submit">Approve</button>
-                        </form>
-                        <form class="d-inline" method="post" asp-action="SetRole">
-                            <input type="hidden" name="id" value="@u.Id" />
-                            <select name="role" class="form-select form-select-sm d-inline w-auto">
-                                <option value="@Role.Student">Student</option>
-                                <option value="@Role.Teacher">Teacher</option>
-                                <option value="@Role.Admin">Admin</option>
-                            </select>
-                            <button class="btn btn-sm btn-secondary" type="submit">Set Role</button>
-                        </form>
-                    </td>
-                </tr>
-            }
-            </tbody>
-        </table>
-    }
+<ul class="nav nav-tabs" id="userTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab">Pending (@m.Pending.Count)</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab">All Users (@m.All.Count)</button>
+    </li>
+</ul>
 
-    <h5 class="mt-4">All Users</h5>
-    <table class="table table-sm">
-        <thead><tr><th>Id</th><th>Name</th><th>Username</th><th>Role</th><th>Approved</th></tr></thead>
-        <tbody>
-        @foreach (var u in all!)
+<div class="tab-content border-start border-end border-bottom p-3">
+    <div class="tab-pane fade show active" id="pending" role="tabpanel">
+        @if (m.Pending.Count == 0)
         {
-            <tr>
-                <td>@u.Id</td>
-                <td>@u.FullName</td>
-                <td>@u.Username</td>
-                <td>@u.Role</td>
-                <td>@(u.IsApproved ? "Yes" : "No")</td>
-            </tr>
+            <div class="alert alert-success">No pending approvals ??</div>
         }
-        </tbody>
-    </table>
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Username</th>
+                            <th>Full Name</th>
+                            <th>Role</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var u in m.Pending)
+                        {
+                            <tr class="table-warning">
+                                <td>@u.Id</td>
+                                <td>@u.Username</td>
+                                <td>@u.FullName</td>
+                                <td><span class="badge bg-warning-subtle text-dark">@u.Role</span></td>
+                                <td>
+                                    <form asp-action="Approve" asp-controller="Admin" method="post" class="d-inline">
+                                        <input type="hidden" name="id" value="@u.Id" />
+                                        <button class="btn btn-sm btn-success">Approve</button>
+                                    </form>
+                                    <form asp-action="Reject" asp-controller="Admin" method="post" class="d-inline">
+                                        <input type="hidden" name="id" value="@u.Id" />
+                                        <button class="btn btn-sm btn-outline-danger">Reject</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
 
-    <a class="btn btn-outline-secondary" href="/Admin/Dashboard">Back</a>
+    <div class="tab-pane fade" id="all" role="tabpanel">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Username</th>
+                        <th>Full Name</th>
+                        <th>Role</th>
+                        <th>Approved</th>
+                        <th>Set Role</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var u in m.All)
+                    {
+                        <tr>
+                            <td>@u.Id</td>
+                            <td>@u.Username</td>
+                            <td>@u.FullName</td>
+                            <td><span class="badge bg-secondary">@u.Role</span></td>
+                            <td>@(u.IsApproved ? "Yes" : "No")</td>
+                            <td>
+                                <form asp-action="SetRole" asp-controller="Admin" method="post" class="d-flex gap-2">
+                                    <input type="hidden" name="id" value="@u.Id" />
+                                    <select name="role" class="form-select form-select-sm" style="max-width: 160px;">
+                                        <option value="@Role.Admin" selected="@(u.Role == Role.Admin)">Admin</option>
+                                        <option value="@Role.Teacher" selected="@(u.Role == Role.Teacher)">Teacher</option>
+                                        <option value="@Role.Student" selected="@(u.Role == Role.Student)">Student</option>
+                                    </select>
+                                    <button class="btn btn-sm btn-outline-primary">Update</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>

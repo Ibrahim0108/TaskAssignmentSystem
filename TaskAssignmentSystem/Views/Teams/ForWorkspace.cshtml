@@ -24,18 +24,30 @@
             <table class="table table-striped">
                 <thead><tr><th>Id</th><th>Name</th><th>Join Code</th><th>Leader</th><th>Members</th><th>Status</th><th></th></tr></thead>
                 <tbody>
-                @foreach (var t in Model)
-                {
-                    <tr>
-                        <td>@t.Id</td>
-                        <td>@t.Name</td>
-                        <td><code>@t.JoinCode</code></td>
-                        <td>@t.LeaderUserId</td>
-                        <td>@t.MemberUserIds.Count</td>
-                        <td>@(t.IsSubmitted ? $"Submitted @ {t.SubmittedAt}" : "In Progress")</td>
-                        <td><a class="btn btn-sm btn-secondary" href="/Teams/Details/@t.Id">Details</a></td>
-                    </tr>
-                }
+                    @foreach (var t in Model)
+                    {
+                        <tr>
+                            <td>@t.Id</td>
+                            <td>@t.Name</td>
+                            <td><code>@t.JoinCode</code></td>
+                            <td>@t.LeaderUserId</td>
+                            <td>@t.MemberUserIds.Count</td>
+                            <td>@(t.IsSubmitted ? $"Submitted @ {t.SubmittedAt}" : "In Progress")</td>
+                            <td>
+                                <a class="btn btn-sm btn-secondary" href="/Teams/Details/@t.Id">Details</a>
+                                @if (role == "Teacher" || role == "Admin")
+                                {
+                                    <a class="btn btn-sm btn-warning" href="/Teams/Edit/@t.Id">Edit</a>
+                                    <form method="post" asp-action="Delete" asp-route-id="@t.Id" style="display:inline;">
+                                        <button type="submit" class="btn btn-sm btn-danger"
+                                                onclick="return confirm('Are you sure you want to delete this team?');">
+                                            Delete
+                                        </button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
                 </tbody>
             </table>
         }
