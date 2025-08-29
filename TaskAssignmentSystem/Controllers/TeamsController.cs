@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using TaskAssignmentSystem.Models.Teams;
 using TaskAssignmentSystem.Models.Users;
 using TaskAssignmentSystem.Services.Interfaces;
 
@@ -23,10 +24,17 @@ namespace TaskAssignmentSystem.Controllers
         {
             var ws = _workspaces.GetById(id);
             if (ws == null) return NotFound();
+
             var list = _teams.GetByWorkspace(id);
+
+            // ?? Load all users for leader lookup
+            var users = _auth.GetAll().ToList();
+            ViewBag.Users = users;
+
             ViewBag.Workspace = ws;
             return View(list);
         }
+
 
         // GET: /Teams/Create?workspaceId=5
         [HttpGet]
@@ -64,7 +72,7 @@ namespace TaskAssignmentSystem.Controllers
         // POST: /Teams/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(int workspaceId, string name, int leaderUserId)
+        public IActionResult Create(int workspaceId, string name, int leaderUserId, string leaderType)
         {
             var role = HttpContext.Session.GetString("UserRole");
             if (role != "Teacher" && role != "Admin")
@@ -77,7 +85,7 @@ namespace TaskAssignmentSystem.Controllers
                 TempData["Error"] = "Team name is required.";
                 return View();
             }
-            var t = _teams.CreateTeam(workspaceId, name.Trim(), leaderUserId);
+            var t = _teams.CreateTeam(workspaceId, name.Trim(), leaderUserId, leaderType);
             TempData["Success"] = $"Team '{t.Name}' created. Join Code: {t.JoinCode}";
             return RedirectToAction("ForWorkspace", new { id = workspaceId });
         }
@@ -134,30 +142,24 @@ namespace TaskAssignmentSystem.Controllers
         // POST: /Teams/AddUpdate
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult AddUpdate(int teamId, string content)
+        public IActionResult AddUpdate(int teamId, string content, string status)
         {
             var userId = HttpContext.Session.GetInt32("UserId");
-            if (userId == null)
-            {
-                TempData["Error"] = "Please login.";
-                return RedirectToAction("Login", "Users");
-            }
+            if (userId == null) return RedirectToAction("Login", "Users");
+
             if (string.IsNullOrWhiteSpace(content))
             {
                 TempData["Error"] = "Update content is required.";
                 return RedirectToAction("Details", new { id = teamId });
             }
-            try
-            {
-                _teams.AddUpdate(teamId, userId.Value, content.Trim());
-                TempData["Success"] = "Update added.";
-            }
-            catch (Exception ex)
-            {
-                TempData["Error"] = ex.Message;
-            }
+
+            Enum.TryParse<SubtaskStatus>(status, out var parsedStatus);
+
+            _teams.AddUpdate(teamId, userId.Value, content.Trim(), parsedStatus);
+            TempData["Success"] = "Update added.";
             return RedirectToAction("Details", new { id = teamId });
         }
+
 
         // POST: /Teams/LeaderReview
         [HttpPost]
@@ -193,14 +195,41 @@ namespace TaskAssignmentSystem.Controllers
 
         // inside TeamsController.cs
 
+        // GET: /Teams/Edit/5
         [HttpGet]
         public IActionResult Edit(int id)
         {
             var t = _teams.GetById(id);
             if (t == null) return NotFound();
+
+            var ws = _workspaces.GetById(t.WorkspaceId);
+            if (ws == null) return NotFound();
+
+            var details = _workspaces.GetWorkspaceDetails(t.WorkspaceId);
+            string? department = details.Department;
+            int? year = details.Year;
+
+            var teachers = _auth.GetAll()
+                .Where(u => u.Role == Role.Teacher && u.Department == department)
+                .ToList();
+
+            var students = _auth.GetAll()
+                .Where(u => u.Role == Role.Student && u.Department == department && u.Year == year)
+                .ToList();
+
+            // figure out leader type
+            var leader = _auth.GetById(t.LeaderUserId);
+            ViewBag.LeaderType = leader?.Role.ToString(); // "Teacher" or "Student"
+
+            ViewBag.Teachers = teachers;
+            ViewBag.Students = students;
+            ViewBag.Workspace = ws;
+
             return View(t);
         }
 
+
+        // POST: /Teams/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, string name, int leaderUserId)
@@ -215,6 +244,7 @@ namespace TaskAssignmentSystem.Controllers
             TempData["Success"] = "Team updated successfully.";
             return RedirectToAction("Details", new { id = id });
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]

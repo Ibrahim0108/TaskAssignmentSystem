@@ -4,10 +4,9 @@
 
 @{
     ViewData["Title"] = "Workspace Details";
-    ViewData["ActiveNav"] = "Workspaces";
     var role = Context.Session.GetString("UserRole");
-    var userId = Context.Session.GetInt32("UserId");
 }
+
 <div class="card p-3 mt-2">
     <div class="d-flex align-items-center">
         <h3 class="mb-0">Workspace: @Model.Name</h3>
@@ -17,19 +16,18 @@
         }
         <div class="ms-auto">
             <a class="btn btn-outline-secondary btn-sm" href="@Url.Action("Index", "Workspaces")">Back</a>
-            @if (role == "Admin")
-            {
-                <a class="btn btn-dark btn-sm ms-2" href="@Url.Action("Dashboard", "Admin")">Admin</a>
-            }
             @if (role == "Teacher" || role == "Admin")
             {
                 <a class="btn btn-warning btn-sm ms-2" asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
             }
         </div>
     </div>
-    <p class="mt-2">Join Code: <code>@Model.JoinCode</code></p>
-    <hr />
+    @if (role == "Teacher")
+    {
+        <p class="mt-2">Join Code: <code>@Model.JoinCode</code></p>
+    }
 
+    <hr />
 
     <div class="mb-3 d-flex gap-2">
         @if (Model.IsTeamBased)
@@ -37,30 +35,54 @@
             if (role == "Teacher")
             {
                 <a class="btn btn-outline-primary" href="@Url.Action("Create", "Teams", new { workspaceId = Model.Id })">Create Team</a>
-                <a class="btn btn-outline-success" href="@Url.Action("Join", "Teams", new { workspaceId = Model.Id })">Join Team</a>
             }
-            else if (role == "Student")
-            {
-                <a class="btn btn-outline-success" href="@Url.Action("Join", "Teams", new { workspaceId = Model.Id })">Join Team</a>
-            }
+            <a class="btn btn-outline-success" href="@Url.Action("Join", "Teams", new { workspaceId = Model.Id })">Join Team</a>
         }
-
     </div>
 
-    <h5>Members (Students)</h5>
-    @if (Model.MemberUserIds == null || Model.MemberUserIds.Count == 0)
+    @if (Model.IsTeamBased)
     {
-        <div class="alert alert-warning">No student members yet. Share the join code!</div>
+        var teams = ViewBag.Teams as List<TaskAssignmentSystem.Models.Teams.Team>;
+        <h5>Teams</h5>
+        @if (teams == null || teams.Count == 0)
+        {
+            <div class="alert alert-warning">No teams yet.</div>
+        }
+        else
+        {
+            <table class="table table-sm table-hover align-middle">
+                <thead><tr><th>Name</th><th>Leader</th><th>Members</th><th></th></tr></thead>
+                <tbody>
+                    @foreach (var t in teams)
+                    {
+                        <tr>
+                            <td>@t.Name</td>
+                            <td>@t.LeaderUserId</td>
+                            <td>@(t.TeamMembers?.Count ?? 0)</td>
+                            <td>
+                                <a class="btn btn-sm btn-outline-primary" href="@Url.Action("Details", "Teams", new { id = t.Id })">Details</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
     }
     else
     {
-        <div class="table-responsive">
+        <h5>Members (Students)</h5>
+        @if (Model.MemberUserIds == null || Model.MemberUserIds.Count == 0)
+        {
+            <div class="alert alert-warning">No student members yet. Share the join code!</div>
+        }
+        else
+        {
             <table class="table table-sm table-hover align-middle">
                 <thead><tr><th>User Id</th><th>Name</th><th>Username</th><th>Role</th></tr></thead>
                 <tbody>
                     @foreach (var id in Model.MemberUserIds)
                     {
-                        var u = Auth.GetById(id);   
+                        var u = Auth.GetById(id);
                         if (u != null)
                         {
                             <tr>
@@ -73,6 +95,6 @@
                     }
                 </tbody>
             </table>
-        </div>
+        }
     }
 </div>

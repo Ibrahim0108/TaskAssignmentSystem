@@ -25,9 +25,11 @@ namespace TaskAssignmentSystem.Models.Teams
         public bool IsSubmitted { get; set; } = false;
         public DateTime? SubmittedAt { get; set; }
 
-        // ? Matches Workspace style
-        public List<int> MemberUserIds { get; set; } = new();
+        [Required, MaxLength(16)]
+        public string LeaderType { get; set; }
 
+        // ? Matches Workspace style
+        public virtual List<TeamMember> TeamMembers { get; set; } = new();
         public virtual List<TeamProgressUpdate> Updates { get; set; } = new();
     }
 

@@ -1,0 +1,32 @@
+﻿@model TaskAssignmentSystem.Models.Workspaces.Workspace
+@{
+    ViewData["Title"] = "Edit Workspace";
+}
+
+<div class="container mt-4">
+    <h3>Edit Workspace</h3>
+    <hr />
+
+    <form asp-action="Edit" method="post">
+        <input type="hidden" asp-for="Id" />
+
+        <div class="mb-3">
+            <label asp-for="Name" class="form-label"></label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Year" class="form-label"></label>
+            <input asp-for="Year" type="number" class="form-control" />
+        </div>
+
+        <div class="form-check mb-3">
+            <input asp-for="IsTeamBased" class="form-check-input" />
+            <label asp-for="IsTeamBased" class="form-check-label">Team Based</label>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>
+    </form>
+</div>

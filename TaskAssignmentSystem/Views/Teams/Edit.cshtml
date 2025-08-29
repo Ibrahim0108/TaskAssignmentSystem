@@ -1,0 +1,95 @@
+﻿@model TaskAssignmentSystem.Models.Teams.Team
+@using TaskAssignmentSystem.Models.Users
+
+@{
+    ViewData["Title"] = "Edit Team";
+    var teachers = ViewBag.Teachers as List<User>;
+    var students = ViewBag.Students as List<User>;
+}
+
+<div class="container mt-4">
+    <h3>Edit Team</h3>
+    <hr />
+
+    <form asp-action="Edit" method="post">
+        <input type="hidden" asp-for="Id" />
+
+        <div class="mb-3">
+            <label asp-for="Name" class="form-label"></label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Leader Type</label>
+            <select asp-for="LeaderType" class="form-control" id="leaderType">
+                <option value="Teacher" selected="@(Model.LeaderType == "Teacher")">Teacher</option>
+                <option value="Student" selected="@(Model.LeaderType == "Student")">Student</option>
+            </select>
+
+
+        </div>
+
+        <div class="mb-3" id="teacherDropdown" style="@(ViewBag.LeaderType == "Teacher" ? "" : "display:none;")">
+    <label class="form-label">Select Teacher</label>
+            <select asp-for="LeaderUserId" class="form-control ">
+              
+                @foreach (var t in teachers)
+                {
+                    if (Model.LeaderUserId == t.Id)
+                    {
+                        <option value="@t.Id" selected="selected">@t.FullName (@t.Username)</option>
+                    }
+                    else
+                    {
+                        <option value="@t.Id">@t.FullName (@t.Username)</option>
+                    }
+                }
+            </select>
+
+</div>
+
+<div class="mb-3" id="studentDropdown" style="@(ViewBag.LeaderType == "Student" ? "" : "display:none;")">
+    <label class="form-label">Select Student</label>
+            <select asp-for="LeaderUserId" class="form-control">
+               
+                @foreach (var s in students)
+                {
+                    if (Model.LeaderUserId == s.Id)
+                    {
+                        <option value="@s.Id" selected="selected">@s.FullName (@s.Username)</option>
+                    }
+                    else
+                    {
+                        <option value="@s.Id">@s.FullName (@s.Username)</option>
+                    }
+                }
+            </select>
+
+</div>
+
+
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a asp-action="ForWorkspace" asp-route-id="@Model.WorkspaceId" class="btn btn-secondary ms-2">Cancel</a>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        var leaderType = document.getElementById('leaderType');
+        var teacherDiv = document.getElementById('teacherDropdown');
+        var studentDiv = document.getElementById('studentDropdown');
+
+        leaderType.addEventListener('change', function(){
+            if(this.value === 'Teacher'){
+                teacherDiv.style.display='block';
+                studentDiv.style.display='none';
+            } else {
+                teacherDiv.style.display='none';
+                studentDiv.style.display='block';
+            }
+        });
+
+
+    </script>
+}

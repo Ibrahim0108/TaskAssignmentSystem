@@ -1,7 +1,11 @@
 @model List<TaskAssignmentSystem.Models.Teams.Team>
+@using TaskAssignmentSystem.Models.Users
+
 @{
     var ws = ViewBag.Workspace as TaskAssignmentSystem.Models.Workspaces.Workspace;
     var role = Context.Session.GetString("UserRole");
+    var users = ViewBag.Users as List<User>;
+
 }
 <div class="container mt-4">
     <h3>Teams in @ws!.Name</h3>
@@ -26,13 +30,50 @@
                 <tbody>
                     @foreach (var t in Model)
                     {
+                        var updates = t.Updates;
+                        var overallProgress = updates.Any()
+                        ? updates.Average(u => (int)u.Status)
+                        : 0;
                         <tr>
                             <td>@t.Id</td>
                             <td>@t.Name</td>
-                            <td><code>@t.JoinCode</code></td>
-                            <td>@t.LeaderUserId</td>
-                            <td>@t.MemberUserIds.Count</td>
-                            <td>@(t.IsSubmitted ? $"Submitted @ {t.SubmittedAt}" : "In Progress")</td>
+                            <td>
+                                @if (role == "Teacher")
+                                {
+                                    <code>@t.JoinCode</code>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Hidden</span>
+                                }
+                            </td>
+
+                            <td>
+                                @{
+                                    var leader = users?.FirstOrDefault(u => u.Id == t.LeaderUserId);
+                                }
+                                @(leader != null ? leader.FullName : $"User {t.LeaderUserId}")
+                            </td>
+
+
+                            <td>@t.TeamMembers.Count</td>
+                            <div class="progress mt-2">
+                                <div class="progress-bar" role="progressbar" style="width:@overallProgress%" aria-valuenow="@overallProgress" aria-valuemin="0" aria-valuemax="100">
+                                    @overallProgress%
+                                </div>
+                            </div>
+
+                            <td>
+                                @if (t.IsSubmitted)
+                                {
+                                    <span class="badge bg-success">Submitted @t.SubmittedAt</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-dark">In Progress</span>
+                                }
+                            </td>
+
                             <td>
                                 <a class="btn btn-sm btn-secondary" href="/Teams/Details/@t.Id">Details</a>
                                 @if (role == "Teacher" || role == "Admin")

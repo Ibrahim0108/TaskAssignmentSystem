@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using TaskAssignmentSystem.Services.Implementations;
 using TaskAssignmentSystem.Services.Interfaces;
 
 namespace TaskAssignmentSystem.Controllers
@@ -7,11 +8,13 @@ namespace TaskAssignmentSystem.Controllers
     {
         private readonly IWorkspaceService _workspaces;
         private readonly IAuthService _auth;
+        private readonly ITeamService _teamService;
 
-        public WorkspacesController(IWorkspaceService workspaces, IAuthService auth)
+        public WorkspacesController(IWorkspaceService workspaces, IAuthService auth, ITeamService teamService)
         {
             _workspaces = workspaces;
             _auth = auth;
+            _teamService = teamService;
         }
 
         public IActionResult Index()
@@ -135,7 +138,16 @@ namespace TaskAssignmentSystem.Controllers
         {
             var ws = _workspaces.GetById(id);
             if (ws == null) return NotFound();
+
+            // fetch teams if workspace is team-based
+            if (ws.IsTeamBased)
+            {
+                var teams = _teamService.GetByWorkspace(id);
+                ViewBag.Teams = teams;
+            }
+
             return View(ws);
         }
+
     }
 }

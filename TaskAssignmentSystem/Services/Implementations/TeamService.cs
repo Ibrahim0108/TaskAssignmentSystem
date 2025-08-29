@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using TaskAssignmentSystem.Data;
 using TaskAssignmentSystem.Models.Teams;
 using TaskAssignmentSystem.Services.Interfaces;
 
@@ -5,56 +7,93 @@ namespace TaskAssignmentSystem.Services.Implementations
 {
     public class TeamService : ITeamService
     {
-        private readonly List<Team> _teams = new();
-        private readonly List<TeamProgressUpdate> _updates = new();
-        private int _nextTeamId = 1;
-        private int _nextUpdateId = 1;
+        private readonly ApplicationDbContext _db;
         private static readonly string Alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+        private readonly Random _rand = new();
 
-        public Team CreateTeam(int workspaceId, string name, int leaderUserId)
+        public TeamService(ApplicationDbContext db)
+        {
+            _db = db;
+        }
+
+        public Team CreateTeam(int workspaceId, string name, int leaderUserId, string leaderType)
         {
             var team = new Team
             {
-                Id = _nextTeamId++,
                 WorkspaceId = workspaceId,
                 Name = name,
                 JoinCode = GenerateJoinCode(6),
                 LeaderUserId = leaderUserId,
+                LeaderType = leaderType,
+                IsSubmitted = false
             };
-            if (!team.MemberUserIds.Contains(leaderUserId))
-                team.MemberUserIds.Add(leaderUserId);
-            _teams.Add(team);
+
+            _db.Teams.Add(team);
+            _db.SaveChanges();
+
+            // Add leader as member automatically
+            var leaderMember = new TeamMember { TeamId = team.Id, UserId = leaderUserId };
+            _db.TeamMembers.Add(leaderMember);
+            _db.SaveChanges();
+
             return team;
         }
 
-        public Team? GetById(int id) => _teams.FirstOrDefault(t => t.Id == id);
+        public Team? GetById(int id)
+        {
+            return _db.Teams
+                .Include(t => t.Updates)
+                .Include(t => t.TeamMembers)
+                .FirstOrDefault(t => t.Id == id);
+        }
 
-        public List<Team> GetByWorkspace(int workspaceId) => _teams.Where(t => t.WorkspaceId == workspaceId).ToList();
+        public List<Team> GetByWorkspace(int workspaceId)
+        {
+            return _db.Teams
+                .Include(t => t.TeamMembers)
+                .Where(t => t.WorkspaceId == workspaceId)
+                .ToList();
+        }
 
-        public Team? GetByJoinCode(string code) => _teams.FirstOrDefault(t => t.JoinCode.Equals(code, StringComparison.OrdinalIgnoreCase));
+        public Team? GetByJoinCode(string code)
+        {
+            return _db.Teams
+                .Include(t => t.TeamMembers)
+                .FirstOrDefault(t => t.JoinCode == code);
+        }
 
         public bool JoinTeamByCode(string code, int userId)
         {
             var team = GetByJoinCode(code);
             if (team == null) return false;
-            if (!team.MemberUserIds.Contains(userId))
-                team.MemberUserIds.Add(userId);
+
+            if (!_db.TeamMembers.Any(m => m.TeamId == team.Id && m.UserId == userId))
+            {
+                _db.TeamMembers.Add(new TeamMember { TeamId = team.Id, UserId = userId });
+                _db.SaveChanges();
+            }
+
             return true;
         }
 
-        public TeamProgressUpdate AddUpdate(int teamId, int userId, string content)
+        public TeamProgressUpdate AddUpdate(int teamId, int userId, string content, SubtaskStatus status)
         {
             var team = GetById(teamId) ?? throw new InvalidOperationException("Team not found");
-            if (!team.MemberUserIds.Contains(userId)) throw new InvalidOperationException("Only members can add updates");
+
+            if (!_db.TeamMembers.Any(m => m.TeamId == teamId && m.UserId == userId))
+                throw new InvalidOperationException("Only members can add updates");
+
             var upd = new TeamProgressUpdate
             {
-                Id = _nextUpdateId++,
                 TeamId = teamId,
                 UserId = userId,
-                Content = content
+                Content = content,
+                CreatedAt = DateTime.UtcNow,
+                Status = status
             };
-            team.Updates.Add(upd);
-            _updates.Add(upd);
+
+            _db.TeamProgressUpdates.Add(upd);
+            _db.SaveChanges();
             return upd;
         }
 
@@ -62,9 +101,12 @@ namespace TaskAssignmentSystem.Services.Implementations
         {
             var team = GetById(teamId);
             if (team == null || team.LeaderUserId != leaderUserId) return false;
-            var upd = team.Updates.FirstOrDefault(u => u.Id == updateId);
+
+            var upd = _db.TeamProgressUpdates.FirstOrDefault(u => u.Id == updateId && u.TeamId == teamId);
             if (upd == null) return false;
+
             upd.ReviewedByLeader = true;
+            _db.SaveChanges();
             return true;
         }
 
@@ -72,44 +114,52 @@ namespace TaskAssignmentSystem.Services.Implementations
         {
             var team = GetById(teamId);
             if (team == null || team.LeaderUserId != leaderUserId) return false;
+
             team.IsSubmitted = true;
             team.SubmittedAt = DateTime.UtcNow;
+            _db.SaveChanges();
             return true;
-        }
-
-        private string GenerateJoinCode(int len)
-        {
-            var rand = new Random();
-            return new string(Enumerable.Range(0, len).Select(_ => Alphabet[rand.Next(Alphabet.Length)]).ToArray());
         }
 
         public bool Update(Team team)
         {
-            var existing = GetById(team.Id);
-            if (existing == null) return false;   // must return here
+            var existing = _db.Teams.Find(team.Id);
+            if (existing == null) return false;
 
             existing.Name = team.Name;
             existing.LeaderUserId = team.LeaderUserId;
-            return true;  // return true when update succeeds
-        }
 
+            _db.SaveChanges();
+            return true;
+        }
 
         public bool Delete(int id)
         {
             var t = GetById(id);
             if (t == null) return false;
-            _teams.Remove(t);
+
+            _db.TeamMembers.RemoveRange(_db.TeamMembers.Where(m => m.TeamId == id));
+            _db.TeamProgressUpdates.RemoveRange(_db.TeamProgressUpdates.Where(u => u.TeamId == id));
+            _db.Teams.Remove(t);
+
+            _db.SaveChanges();
             return true;
         }
 
         public bool RemoveMember(int teamId, int userId)
         {
-            var t = GetById(teamId);
-            if (t == null) return false;
-            return t.MemberUserIds.Remove(userId);
+            var member = _db.TeamMembers.FirstOrDefault(m => m.TeamId == teamId && m.UserId == userId);
+            if (member == null) return false;
+
+            _db.TeamMembers.Remove(member);
+            _db.SaveChanges();
+            return true;
         }
 
-
-
+        private string GenerateJoinCode(int len)
+        {
+            return new string(Enumerable.Range(0, len)
+                .Select(_ => Alphabet[_rand.Next(Alphabet.Length)]).ToArray());
+        }
     }
 }

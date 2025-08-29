@@ -55,7 +55,17 @@ else
                         <tr>
                             <td>@w.Id</td>
                             <td>@w.Name</td>
-                            <td><code>@w.JoinCode</code></td>
+                            <td>
+                                @if (isTeacher)
+                                {
+                                    <code>@w.JoinCode</code>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Hidden</span>
+                                }
+                            </td>
+
                             <td>
                                 @if (w.IsActive)
                                 {
@@ -79,7 +89,7 @@ else
 
                                     @if (w.IsActive)
                                     {
-                                        <form method="post" asp-action="Inactivate" asp-route-id="@w.Id" style="display:inline;">
+                                        <form method="post" asp-action="MarkInactive" asp-route-id="@w.Id" style="display:inline;">
                                             <button type="submit" class="btn btn-sm btn-secondary">Inactivate</button>
                                         </form>
                                     }
