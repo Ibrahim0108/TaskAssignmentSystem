@@ -2,9 +2,8 @@
     ViewData["Title"] = "Login";
     ViewData["ActiveNav"] = "Login";
 }
-<div class="row justify-content-center">
-    <div class="col-md-6 col-lg-4">
-        <div class="card p-4 mt-4">
+
+        <div class="card">
             <h3 class="mb-3 text-center">Welcome back</h3>
             <p class="text-muted text-center mb-4">Sign in to continue</p>
 
@@ -25,5 +24,193 @@
                 <a href="@Url.Action("Register", "Users")" class="ms-1">Register</a>
             </div>
         </div>
-    </div>
-</div>
+
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #f0f9f0 0%, #e8f5e8 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+
+    /* Card Styles - Made wider */
+    .card {
+        background: linear-gradient(145deg, #ffffff 0%, #fefffe 100%);
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(34, 197, 94, 0.15);
+        border: 1px solid rgba(34, 197, 94, 0.1);
+        padding: 35px;
+        width: 380px;
+        height: 444px;
+        animation: slideInUp 0.6s ease-out;
+        position: relative; /* Add this line */
+        overflow: hidden;
+        margin-top:30px;
+    }
+
+    @@keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Top gradient bar */
+    .card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #22c55e 0%, #16a34a 50%, #15803d 100%);
+        border-radius: 20px 20px 0 0;
+    }
+
+    /* Typography */
+    h3 {
+        color: #16a34a;
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .mb-3 {
+        margin-bottom: 20px;
+    }
+
+    .mb-4 {
+        margin-bottom: 25px;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .text-muted {
+        color: #6b7280;
+        font-size: 15px;
+        font-weight: 500;
+    }
+
+    /* Form Styles */
+    .form-label {
+        display: block;
+        margin-bottom: 8px;
+        color: #374151;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 14px 16px;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        font-size: 15px;
+        background: #fafafa;
+        transition: all 0.3s ease;
+    }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #22c55e;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+        }
+
+    /* Button Styles */
+    .btn {
+        padding: 14px 24px;
+        border-radius: 12px;
+        font-size: 15px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(34, 197, 94, 0.25);
+    }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(34, 197, 94, 0.3);
+        }
+
+    .w-100 {
+        width: 100%;
+    }
+
+    /* Link Styles */
+    a {
+        color: #16a34a;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s ease;
+    }
+
+        a:hover {
+            color: #15803d;
+            text-decoration: underline;
+        }
+
+    .ms-1 {
+        margin-left: 4px;
+    }
+
+    .mt-3 {
+        margin-top: 20px;
+    }
+
+    /* Footer Styles */
+    .login-footer {
+        text-align: center;
+        padding: 15px 0;
+        width: 100%;
+    }
+
+        .login-footer small {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+    /* Responsive Design */
+    @@media (max-width: 480px) {
+        body {
+            padding: 15px;
+        }
+
+        .card {
+            padding: 25px 20px;
+        }
+
+        h3 {
+            font-size: 24px;
+        }
+
+        .form-control {
+            padding: 12px 14px;
+        }
+    }
+</style>

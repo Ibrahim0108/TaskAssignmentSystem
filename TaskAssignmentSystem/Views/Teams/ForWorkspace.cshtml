@@ -1,5 +1,6 @@
 @model List<TaskAssignmentSystem.Models.Teams.Team>
 @using TaskAssignmentSystem.Models.Users
+@using TaskAssignmentSystem.Models.Teams
 
 @{
     var ws = ViewBag.Workspace as TaskAssignmentSystem.Models.Workspaces.Workspace;
@@ -16,7 +17,7 @@
     {
         <a class="btn btn-primary" href="/Teams/Create?workspaceId=@ws.Id">Create Team</a>
     }
-    <a class="btn btn-outline-secondary ms-2" href="/Workspaces/Details/@ws.Id">Back to Workspace</a>
+    <a class="btn btn-outline-success ms-2" href="/Teams/Join?workspaceId=@ws.Id">Join Team</a>
 
     <div class="mt-3">
         @if (!Model.Any())
@@ -26,14 +27,49 @@
         else
         {
             <table class="table table-striped">
-                <thead><tr><th>Id</th><th>Name</th><th>Join Code</th><th>Leader</th><th>Members</th><th>Status</th><th></th></tr></thead>
+                <thead><tr><th>Id</th><th>Name</th><th>Join Code</th><th>Leader</th><th>Members</th><th>Progress</th><th>Status</th><th></th></tr></thead>
                 <tbody>
                     @foreach (var t in Model)
                     {
                         var updates = t.Updates;
+
+                        Func<SubtaskStatus, int> statusToPercent = status =>
+                        {
+                            return status switch
+                            {
+                                SubtaskStatus.NotStarted => 0,
+                                SubtaskStatus.InProgress => 50,
+                                SubtaskStatus.Completed => 100,
+                                SubtaskStatus.Blocked => 25,
+                                _ => 0
+                            };
+                        };
+
                         var overallProgress = updates.Any()
-                        ? updates.Average(u => (int)u.Status)
+                        ? (int)updates.Average(u => statusToPercent(u.Status))
                         : 0;
+
+
+                        // decide text
+                        string progressText = overallProgress switch
+                        {
+                            0 => "Not Started",
+                            <= 49 => "In Progress",
+                            < 100 => "Almost Done",
+                            100 => "Completed",
+                            _ => "Unknown"
+                        };
+
+                        // decide bar color
+                        string progressBarClass = overallProgress switch
+                        {
+                            0 => "bg-secondary",
+                            <= 49 => "bg-warning",
+                            < 100 => "bg-info",
+                            100 => "bg-success",
+                            _ => "bg-secondary"
+                        };
+
                         <tr>
                             <td>@t.Id</td>
                             <td>@t.Name</td>
@@ -56,12 +92,22 @@
                             </td>
 
 
-                            <td>@t.TeamMembers.Count</td>
-                            <div class="progress mt-2">
-                                <div class="progress-bar" role="progressbar" style="width:@overallProgress%" aria-valuenow="@overallProgress" aria-valuemin="0" aria-valuemax="100">
-                                    @overallProgress%
+                            <td>
+                                <div class="progress" style="height: 25px;">
+                                    <div class="progress-bar @progressBarClass"
+                                         role="progressbar"
+                                         style="width:@overallProgress%"
+                                         aria-valuenow="@overallProgress"
+                                         aria-valuemin="0"
+                                         aria-valuemax="100">
+                                    </div>
                                 </div>
-                            </div>
+                                <div class="small text-muted mt-1">
+                                    @progressText (@overallProgress%)
+                                </div>
+                            </td>
+
+
 
                             <td>
                                 @if (t.IsSubmitted)

@@ -16,5 +16,6 @@ public interface IWorkspaceService
 
     bool Update(Workspace workspace);
 
+    IEnumerable<Workspace> GetByStudent(int studentId);
 
 }

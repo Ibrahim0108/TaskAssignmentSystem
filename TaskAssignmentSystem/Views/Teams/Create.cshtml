@@ -19,9 +19,9 @@
         </select>
     </div>
 
-    <div class="mb-3" id="teacherDropdown">
+    <div class="mb-3" id="teacherDropdown" >
         <label class="form-label">Select Teacher</label>
-        <select name="leaderUserId" class="form-select">
+        <select name="teacherUserId" class="form-select">
             @foreach (var t in teachers)
             {
                 <option value="@t.Id">@t.FullName (@t.Username)</option>
@@ -31,7 +31,7 @@
 
     <div class="mb-3" id="studentDropdown" style="display:none;">
         <label class="form-label">Select Student</label>
-        <select name="leaderUserId" class="form-select">
+        <select name="studentUserId" class="form-select">
             @foreach (var s in students)
             {
                 <option value="@s.Id">@s.FullName (@s.Username)</option>

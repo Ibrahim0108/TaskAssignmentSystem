@@ -18,48 +18,306 @@
     <link href="../Views/Shared/_Layout.cshtml.css" rel="stylesheet" />
 
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            padding-top: 70px;
-            animation: fadeIn 0.4s ease-in;
-        }
-        @@keyframes fadeIn {
-            from {
-                 opacity: 0;
-                 }
-
-            to {
-            opacity: 1;
-                }
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f0f9f0 0%, #e8f5e8 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
-        .navbar .nav-link {
-            transition: color .2s ease, transform .2s ease;
+        /* Navigation Styles */
+        nav {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fffe 100%);
+            box-shadow: 0 4px 20px rgba(34, 197, 94, 0.1);
+            border-bottom: 2px solid rgba(34, 197, 94, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1030;
         }
 
-            .navbar .nav-link:hover {
+        .container-fluid {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 70px;
+            flex-wrap: wrap;
+        }
+
+        .navbar-brand {
+            font-size: 24px;
+            font-weight: 600;
+            color: #16a34a;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            margin-right: 30px;
+        }
+
+            .navbar-brand:hover {
+                color: #15803d;
+            }
+
+        .nav-link {
+            color: #4b5563;
+            text-decoration: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+            .nav-link:hover {
+                color: #16a34a;
+                background: rgba(34, 197, 94, 0.1);
                 transform: translateY(-1px);
             }
 
-        .card {
-            border-radius: 0.75rem;
-            box-shadow: 0 6px 18px rgba(0,0,0,.06);
+            .nav-link.active {
+                color: white;
+                background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+                box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+            }
+
+        /* Alert Styles */
+        .alert-container {
+            position: fixed;
+            top: 90px;
+            left: 0;
+            right: 0;
+            z-index: 1020;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
         }
 
-        .table-hover tbody tr:hover {
-            background-color: #f7f9fc;
+        .alert {
+            padding: 18px 24px;
+            margin: 16px 0;
+            border-radius: 12px;
+            border: none;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            animation: slideInAlert 0.4s ease-out;
+            font-size: 15px;
+            line-height: 1.6;
+            font-weight: 500;
         }
 
-        .badge-pill {
-            border-radius: 999px;
+        @@keyframes slideInAlert {
+            from
+
+        {
+            opacity: 0;
+            transform: translateY(-25px) scale(0.95);
         }
 
-        .btn-ghost {
-            background: transparent;
-            border: 1px solid rgba(255,255,255,.2);
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
         }
 
-        .toast-container {
-            z-index: 1080;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+            border-left: 5px solid #22c55e;
+            color: #15803d;
+            padding-left: 60px;
+        }
+
+            .alert-success::before {
+                content: '✓';
+                position: absolute;
+                left: 18px;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: 18px;
+                font-weight: bold;
+                color: #16a34a;
+                background: white;
+                width: 28px;
+                height: 28px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 2px 8px rgba(34, 197, 94, 0.2);
+            }
+
+        /* Main container */
+        .main-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding-top: 50px;
+            margin-top: 20px;
+        }
+
+        /* Login Form Specific Styles */
+        .login-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 280px);
+            padding: 40px 20px;
+            width: 100%;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(34, 197, 94, 0.15);
+            border: 1px solid rgba(34, 197, 94, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+            .login-header h2 {
+                color: #16a34a;
+                font-weight: 600;
+                margin-bottom: 10px;
+            }
+
+            .login-header p {
+                color: #6b7280;
+                font-size: 16px;
+            }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+            .form-group label {
+                display: block;
+                margin-bottom: 8px;
+                color: #4b5563;
+                font-weight: 500;
+            }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+            .form-control:focus {
+                outline: none;
+                border-color: #22c55e;
+                box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+            }
+
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+            .btn-login:hover {
+                background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+            }
+
+        .login-links {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+            .login-links a {
+                color: #22c55e;
+                text-decoration: none;
+                font-weight: 500;
+                transition: color 0.3s ease;
+            }
+
+                .login-links a:hover {
+                    color: #15803d;
+                    text-decoration: underline;
+                }
+
+        /* Footer Styles */
+        footer {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fffe 100%);
+            border-top: 2px solid rgba(34, 197, 94, 0.15);
+            padding: 24px 0;
+            text-align: center;
+            margin-top: auto;
+            box-shadow: 0 -4px 20px rgba(34, 197, 94, 0.08);
+            width: 100%;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        footer small {
+            color: #6b7280;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Responsive Design */
+        @@media (max-width: 768px) {
+            .login-container
+
+        {
+            padding: 30px 25px;
+            margin: 0 15px;
+        }
+
+        .alert-container {
+            top: 70px;
+            padding: 0 15px;
+        }
+
+        .alert {
+            padding: 16px 20px;
+            padding-left: 55px;
+            font-size: 14px;
+        }
+
+        }
+
+        @@media (min-width: 992px) {
+            .login-container
+
+        {
+            padding: 50px;
+            max-width: 550px;
+        }
+
         }
     </style>
 </head>
@@ -145,7 +403,8 @@
         </nav>
     </header>
 
-    <div class="container">
+    <!-- Alert container positioned below navbar -->
+    <div class="alert-container">
         @if (TempData["Success"] != null)
         {
             <div class="alert alert-success alert-dismissible fade show mt-2" role="alert">
@@ -160,17 +419,22 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         }
+    </div>
 
-        <main role="main" class="pb-4">
-            @RenderBody()
-        </main>
+    <div class="main-container">
+        <div class="container">
+            <main role="main" class="pb-4">
+                @RenderBody()
+            </main>
+        </div>
     </div>
 
     @await Html.PartialAsync("_ConfirmModal")
 
-
-    <footer class="border-top py-3 text-center text-muted">
-        <small>&copy; @DateTime.UtcNow.Year - TaskAssignmentSystem</small>
+    <footer class="border-top py-3">
+        <div class="footer-content text-center text-muted">
+            <small>&copy; @DateTime.UtcNow.Year - TaskAssignmentSystem</small>
+        </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

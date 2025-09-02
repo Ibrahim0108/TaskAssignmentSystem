@@ -26,14 +26,17 @@ namespace TaskAssignmentSystem.Models.Teams
 
         [ForeignKey("TeamId")]
         public virtual Team Team { get; set; }
+
+        public int? AssignedToUserId { get; set; }
     }
 
 
     public enum SubtaskStatus
     {
-        NotStarted = 0,
-        InProgress = 50,
-        Completed = 100,
-        Blocked = 0
+        NotStarted,
+        InProgress,
+        Completed,
+        Blocked
     }
+
 }

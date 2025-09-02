@@ -50,6 +50,7 @@ namespace TaskAssignmentSystem.Services.Implementations
         public List<Team> GetByWorkspace(int workspaceId)
         {
             return _db.Teams
+                .Include(t => t.Updates)
                 .Include(t => t.TeamMembers)
                 .Where(t => t.WorkspaceId == workspaceId)
                 .ToList();
@@ -76,7 +77,7 @@ namespace TaskAssignmentSystem.Services.Implementations
             return true;
         }
 
-        public TeamProgressUpdate AddUpdate(int teamId, int userId, string content, SubtaskStatus status)
+        public TeamProgressUpdate AddUpdate(int teamId, int userId, string content, SubtaskStatus status, int? assignedToUserId = null)
         {
             var team = GetById(teamId) ?? throw new InvalidOperationException("Team not found");
 
@@ -89,7 +90,8 @@ namespace TaskAssignmentSystem.Services.Implementations
                 UserId = userId,
                 Content = content,
                 CreatedAt = DateTime.UtcNow,
-                Status = status
+                Status = status,
+                AssignedToUserId = assignedToUserId
             };
 
             _db.TeamProgressUpdates.Add(upd);

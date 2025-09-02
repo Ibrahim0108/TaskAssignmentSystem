@@ -1,20 +1,359 @@
-﻿@{
-    ViewData["Title"] = "Home";
-}
-<div class="container mt-4">
-    <h2>Welcome to Task Assignment System</h2>
-    <p class="text-muted">Education-focused Workspaces, Users, and Tasks.</p>
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Task Assignment System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    @if (ViewBag.CurrentUserName == null)
-    {
-        
-    }
-    else
-    {
-        <div class="alert alert-success">
-            Logged in as <strong>@ViewBag.CurrentUserName</strong> (@ViewBag.CurrentUserRole)
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f0f9f0 0%, #e8f5e8 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .mt-4 {
+            margin-top: 32px;
+        }
+
+        /* Welcome Section */
+        .welcome-section {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fffe 100%);
+            border-radius: 20px;
+            padding: 48px 40px;
+            margin: 32px 0;
+            box-shadow: 0 8px 32px rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .welcome-section::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: linear-gradient(90deg, #22c55e 0%, #16a34a 50%, #15803d 100%);
+            }
+
+            .welcome-section h2 {
+                color: #16a34a;
+                font-size: 36px;
+                font-weight: 700;
+                margin-bottom: 16px;
+                letter-spacing: -0.5px;
+            }
+
+            .welcome-section .text-muted {
+                color: #6b7280;
+                font-size: 18px;
+                font-weight: 500;
+                margin-bottom: 0;
+            }
+
+        /* Alert Styles */
+        .alert {
+            padding: 20px 24px;
+            margin: 24px 0;
+            border-radius: 12px;
+            border: none;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            animation: slideInAlert 0.4s ease-out;
+            font-size: 16px;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        @@keyframes slideInAlert {
+            from
+
+        {
+            opacity: 0;
+            transform: translateY(-25px) scale(0.95);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+            border-left: 5px solid #22c55e;
+            color: #15803d;
+            position: relative;
+            padding-left: 60px;
+        }
+
+            .alert-success::before {
+                content: '👋';
+                position: absolute;
+                left: 20px;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: 20px;
+                background: white;
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 2px 8px rgba(34, 197, 94, 0.2);
+            }
+
+        .alert strong {
+            color: #15803d;
+            font-weight: 600;
+        }
+
+        /* Text utilities */
+        .text-muted {
+            color: #6b7280 !important;
+        }
+
+        /* Demo content for logged out state */
+        .login-prompt {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 2px dashed rgba(34, 197, 94, 0.3);
+            border-radius: 16px;
+            padding: 40px 32px;
+            text-align: center;
+            margin: 32px 0;
+            transition: all 0.3s ease;
+        }
+
+            .login-prompt:hover {
+                border-color: rgba(34, 197, 94, 0.5);
+                background: linear-gradient(135deg, #f0f9f0 0%, #e8f5e8 100%);
+            }
+
+            .login-prompt h3 {
+                color: #16a34a;
+                font-size: 24px;
+                margin-bottom: 12px;
+                font-weight: 600;
+            }
+
+            .login-prompt p {
+                color: #6b7280;
+                font-size: 16px;
+                margin-bottom: 24px;
+            }
+
+        .login-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+        }
+
+            .btn-primary:hover {
+                background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+                box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
+                transform: translateY(-2px);
+                color: white;
+            }
+
+        .btn-outline {
+            background: transparent;
+            color: #16a34a;
+            border: 2px solid #22c55e;
+        }
+
+            .btn-outline:hover {
+                background: #22c55e;
+                color: white;
+                transform: translateY(-2px);
+            }
+
+        /* Features section */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin: 40px 0;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px 24px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(34, 197, 94, 0.08);
+            border: 1px solid rgba(34, 197, 94, 0.1);
+            transition: all 0.3s ease;
+        }
+
+            .feature-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 8px 32px rgba(34, 197, 94, 0.15);
+            }
+
+        .feature-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .feature-card h4 {
+            color: #16a34a;
+            font-size: 20px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .feature-card p {
+            color: #6b7280;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* Responsive Design */
+        @@media (max-width: 768px) {
+            .container
+
+        {
+            padding: 0 15px;
+        }
+
+        .welcome-section {
+            padding: 32px 24px;
+            margin: 20px 0;
+        }
+
+            .welcome-section h2 {
+                font-size: 28px;
+            }
+
+            .welcome-section .text-muted {
+                font-size: 16px;
+            }
+
+        .alert {
+            padding: 16px 20px;
+            padding-left: 55px;
+            font-size: 15px;
+        }
+
+        .alert-success::before {
+            width: 28px;
+            height: 28px;
+            font-size: 16px;
+            left: 16px;
+        }
+
+        .login-prompt {
+            padding: 32px 20px;
+        }
+
+        .login-buttons {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .btn {
+            width: 100%;
+            max-width: 200px;
+        }
+
+        .features {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .feature-card {
+            padding: 24px 20px;
+        }
+
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="welcome-section">
+            <h2>Welcome to Task Assignment System</h2>
+            <p class="text-muted">Education-focused Workspaces, Users, and Tasks.</p>
         </div>
-       
-    }
+        @if (ViewBag.CurrentUserName == null)
+        {
 
-</div>
+        }
+        else
+        {
+            <div class="alert alert-success">
+                Logged in as <strong>@ViewBag.CurrentUserName</strong> (@ViewBag.CurrentUserRole)
+            </div>
+
+        }
+
+        <!-- Features section -->
+        <div class="features">
+            <div class="feature-card">
+                <span class="feature-icon">📚</span>
+                <h4>Workspaces</h4>
+                <p>Create and manage educational workspaces for different classes and projects</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">👥</span>
+                <h4>User Management</h4>
+                <p>Efficiently organize students, teachers, and administrators in your system</p>
+            </div>
+            <div class="feature-card">
+                <span class="feature-icon">✅</span>
+                <h4>Task Assignment</h4>
+                <p>Assign, track, and manage educational tasks with ease and clarity</p>
+            </div>
+        </div>
+    </div>
+    <script>
+        (function()
+        {function c()
+            {var b=a.contentDocument||a.contentWindow.document;
+                if(b){var d=b.createElement('script');
+                d.innerHTML="window.__CF$cv$params={r:'978c3ec6a21e4e3d',t:'MTc1NjgwODExNi4wMDAwMDA='};
+                var a=document.createElement('script')
+                ;a.nonce='';
+                a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';
+                document.getElementsByTagName('head')[0].appendChild(a);
+                ";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+</body>
+</html>

@@ -47,7 +47,7 @@ else
         <div class="table-responsive">
             <table class="table table-hover align-middle">
                 <thead>
-                    <tr><th>Id</th><th>Name</th><th>Join Code</th><th>Status</th><th></th></tr>
+                    <tr><th>Id</th><th>Name</th><th>Join Code</th><th>Status</th><th>Progress</th><th></th></tr>
                 </thead>
                 <tbody>
                     @foreach (var w in Model)
@@ -77,6 +77,18 @@ else
                                     <span class="badge bg-secondary">Inactive</span>
                                 }
                             </td>
+                            <td>
+                                <div class="progress" style="height:20px; min-width:100px;">
+                                    @{
+                                        var progressPercent = ViewBag.WorkspaceProgress[w.Id] ?? 0;
+                                    }
+                                    <div class="progress-bar bg-info" role="progressbar"
+                                         style="width:@progressPercent%">
+                                        @progressPercent%
+                                    </div>
+                                </div>
+
+                            </td>
                             <td class="text-end">
                                 <a class="btn btn-sm btn-outline-primary" href="@Url.Action("Details", "Workspaces", new { id = w.Id })">Details</a>
                             </td>
@@ -101,6 +113,8 @@ else
                                     }
                                 }
                             </td>
+
+
 
                         </tr>
                     }

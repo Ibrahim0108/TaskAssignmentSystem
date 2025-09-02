@@ -72,8 +72,16 @@ namespace TaskAssignmentSystem.Controllers
         // POST: /Teams/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(int workspaceId, string name, int leaderUserId, string leaderType)
+        public IActionResult Create(int workspaceId, string name, int? teacherUserId, int? studentUserId, string leaderType)
         {
+            int leaderUserId = 0;
+
+            if (leaderType == "Teacher" && teacherUserId.HasValue)
+                leaderUserId = teacherUserId.Value;
+            else if (leaderType == "Student" && studentUserId.HasValue)
+                leaderUserId = studentUserId.Value;
+
+
             var role = HttpContext.Session.GetString("UserRole");
             if (role != "Teacher" && role != "Admin")
             {
@@ -142,7 +150,7 @@ namespace TaskAssignmentSystem.Controllers
         // POST: /Teams/AddUpdate
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult AddUpdate(int teamId, string content, string status)
+        public IActionResult AddUpdate(int teamId, string content, SubtaskStatus status)
         {
             var userId = HttpContext.Session.GetInt32("UserId");
             if (userId == null) return RedirectToAction("Login", "Users");
@@ -153,9 +161,9 @@ namespace TaskAssignmentSystem.Controllers
                 return RedirectToAction("Details", new { id = teamId });
             }
 
-            Enum.TryParse<SubtaskStatus>(status, out var parsedStatus);
+            
 
-            _teams.AddUpdate(teamId, userId.Value, content.Trim(), parsedStatus);
+            _teams.AddUpdate(teamId, userId.Value, content.Trim(), status);
             TempData["Success"] = "Update added.";
             return RedirectToAction("Details", new { id = teamId });
         }
@@ -264,6 +272,32 @@ namespace TaskAssignmentSystem.Controllers
             return RedirectToAction("Details", new { id = teamId });
         }
 
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult AssignTask(int teamId, int assignedToUserId, string content)
+        {
+            var leaderId = HttpContext.Session.GetInt32("UserId");
+            if (leaderId == null) return RedirectToAction("Login", "Users");
+
+            var team = _teams.GetById(teamId);
+            if (team == null || team.LeaderUserId != leaderId.Value)
+            {
+                TempData["Error"] = "Only leader can assign tasks.";
+                return RedirectToAction("Details", new { id = teamId });
+            }
+
+            if (string.IsNullOrWhiteSpace(content))
+            {
+                TempData["Error"] = "Task content is required.";
+                return RedirectToAction("Details", new { id = teamId });
+            }
+
+            _teams.AddUpdate(teamId, leaderId.Value, content.Trim(), SubtaskStatus.NotStarted, assignedToUserId);
+
+            TempData["Success"] = "Task assigned successfully.";
+            return RedirectToAction("Details", new { id = teamId });
+        }
 
 
     }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using TaskAssignmentSystem.Models.Task;
 using TaskAssignmentSystem.Models.Teams;
 using TaskAssignmentSystem.Models.Users;
 using TaskAssignmentSystem.Models.Workspaces;
@@ -10,6 +11,8 @@ namespace TaskAssignmentSystem.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }
+        public DbSet<WorkspaceTask> WorkspaceTasks { get; set; }
+        public DbSet<TaskProgress> TaskProgresses { get; set; }
 
         public DbSet<User> Users => Set<User>();
         public DbSet<Workspace> Workspaces => Set<Workspace>();

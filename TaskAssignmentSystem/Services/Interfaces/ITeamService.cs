@@ -9,7 +9,7 @@ namespace TaskAssignmentSystem.Services.Interfaces
         List<Team> GetByWorkspace(int workspaceId);
         Team? GetByJoinCode(string code);
         bool JoinTeamByCode(string code, int userId);
-        TeamProgressUpdate AddUpdate(int teamId, int userId, string content, SubtaskStatus status);
+        TeamProgressUpdate AddUpdate(int teamId, int userId, string content, SubtaskStatus status, int? assignedToUserId = null);
         bool LeaderReviewUpdate(int teamId, int updateId, int leaderUserId);
         bool SubmitTeam(int teamId, int leaderUserId);
         bool Update(Team team);

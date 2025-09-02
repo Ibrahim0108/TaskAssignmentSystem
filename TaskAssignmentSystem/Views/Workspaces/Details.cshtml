@@ -1,4 +1,6 @@
 @model TaskAssignmentSystem.Models.Workspaces.Workspace
+@using TaskAssignmentSystem.Models.Task
+
 @inject TaskAssignmentSystem.Services.Interfaces.IAuthService Auth
 @using Microsoft.AspNetCore.Http
 
@@ -43,58 +45,62 @@
     @if (Model.IsTeamBased)
     {
         var teams = ViewBag.Teams as List<TaskAssignmentSystem.Models.Teams.Team>;
-        <h5>Teams</h5>
-        @if (teams == null || teams.Count == 0)
+    }
+
+    @if (!Model.IsTeamBased)
+    {
+        <h5>Class Tasks</h5>
+        @if (ViewBag.Tasks == null || !((List<WorkspaceTask>)ViewBag.Tasks).Any())
         {
-            <div class="alert alert-warning">No teams yet.</div>
+            <div class="alert alert-info">No tasks yet.</div>
         }
         else
         {
-            <table class="table table-sm table-hover align-middle">
-                <thead><tr><th>Name</th><th>Leader</th><th>Members</th><th></th></tr></thead>
+            <table class="table table-sm">
+                <thead><tr><th>Title</th><th>Description</th><th>Progress</th><th>Action</th></tr></thead>
                 <tbody>
-                    @foreach (var t in teams)
+                    @foreach (var task in (List<WorkspaceTask>)ViewBag.Tasks)
                     {
+                        var progress = (task.ProgressUpdates.FirstOrDefault(p => p.StudentId == (int)Context.Session.GetInt32("UserId"))?.ProgressPercent) ?? 0;
                         <tr>
-                            <td>@t.Name</td>
-                            <td>@t.LeaderUserId</td>
-                            <td>@(t.TeamMembers?.Count ?? 0)</td>
+                            <td>@task.Title</td>
+                            <td>@task.Description</td>
                             <td>
-                                <a class="btn btn-sm btn-outline-primary" href="@Url.Action("Details", "Teams", new { id = t.Id })">Details</a>
+                                <div class="progress" style="height:20px;">
+                                    <div class="progress-bar bg-success" role="progressbar" style="width:@progress%">
+                                        @progress%
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                @if (role == "Student")
+                                {
+                                    <form method="post" asp-action="UpdateProgress" asp-controller="Workspaces">
+                                        <input type="hidden" name="taskId" value="@task.Id" />
+                                        <input type="number" name="progress" min="0" max="100" value="@progress" class="form-control form-control-sm" style="width:80px;display:inline;" />
+                                        <button type="submit" class="btn btn-sm btn-primary">Update</button>
+                                    </form>
+                                }
                             </td>
                         </tr>
                     }
                 </tbody>
             </table>
         }
-    }
-    else
-    {
-        <h5>Members (Students)</h5>
-        @if (Model.MemberUserIds == null || Model.MemberUserIds.Count == 0)
+
+        @if (role == "Teacher")
         {
-            <div class="alert alert-warning">No student members yet. Share the join code!</div>
-        }
-        else
-        {
-            <table class="table table-sm table-hover align-middle">
-                <thead><tr><th>User Id</th><th>Name</th><th>Username</th><th>Role</th></tr></thead>
-                <tbody>
-                    @foreach (var id in Model.MemberUserIds)
-                    {
-                        var u = Auth.GetById(id);
-                        if (u != null)
-                        {
-                            <tr>
-                                <td>@u.Id</td>
-                                <td>@u.FullName</td>
-                                <td>@u.Username</td>
-                                <td>@u.Role</td>
-                            </tr>
-                        }
-                    }
-                </tbody>
-            </table>
+            <form method="post" asp-action="AssignTask">
+                <input type="hidden" name="workspaceId" value="@Model.Id" />
+                <div class="mb-2">
+                    <input type="text" name="title" class="form-control" placeholder="Task title" required />
+                </div>
+                <div class="mb-2">
+                    <textarea name="description" class="form-control" placeholder="Task description"></textarea>
+                </div>
+                <button type="submit" class="btn btn-sm btn-success">Assign Task</button>
+            </form>
         }
     }
+
 </div>

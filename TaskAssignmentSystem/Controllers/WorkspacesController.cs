@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using TaskAssignmentSystem.Models.Task;
+using TaskAssignmentSystem.Models.Workspaces;
 using TaskAssignmentSystem.Services.Implementations;
 using TaskAssignmentSystem.Services.Interfaces;
 
@@ -9,19 +11,59 @@ namespace TaskAssignmentSystem.Controllers
         private readonly IWorkspaceService _workspaces;
         private readonly IAuthService _auth;
         private readonly ITeamService _teamService;
+        private readonly ITaskService _taskService;
 
-        public WorkspacesController(IWorkspaceService workspaces, IAuthService auth, ITeamService teamService)
+        public WorkspacesController(ITaskService taskService,IWorkspaceService workspaces, IAuthService auth, ITeamService teamService)
         {
             _workspaces = workspaces;
             _auth = auth;
             _teamService = teamService;
+            _taskService = taskService;
         }
 
         public IActionResult Index()
         {
-            var data = _workspaces.GetActive();
+            var role = HttpContext.Session.GetString("UserRole");
+            var userId = HttpContext.Session.GetInt32("UserId");
+
+            IEnumerable<Workspace> data = Enumerable.Empty<Workspace>();
+
+            if (role == "Teacher" && userId.HasValue)
+            {
+                data = _workspaces.GetActive().Where(ws => ws.CreatedByUserId == userId.Value);
+            }
+            else if (role == "Admin")
+            {
+                data = _workspaces.GetActive();
+            }
+            else if (role == "Student" && userId.HasValue)
+            {
+                data = _workspaces.GetByStudent(userId.Value);
+            }
+
+            // Compute progress for each workspace
+            var workspaceProgress = data.ToDictionary(
+                w => w.Id,
+                w =>
+                {
+                    var tasks = _taskService.GetTasksByWorkspace(w.Id); // get all tasks for this workspace
+                    if (!tasks.Any()) return 0;
+
+                    var allProgress = tasks
+                        .SelectMany(t => t.ProgressUpdates)
+                        .DefaultIfEmpty()
+                        .Average(p => p?.ProgressPercent ?? 0);
+
+                    return (int)allProgress;
+                }
+            );
+
+            ViewBag.WorkspaceProgress = workspaceProgress;
+
             return View(data);
         }
+
+
 
         [HttpGet]
         public IActionResult Create()
@@ -139,15 +181,50 @@ namespace TaskAssignmentSystem.Controllers
             var ws = _workspaces.GetById(id);
             if (ws == null) return NotFound();
 
-            // fetch teams if workspace is team-based
+            // if team-based ? redirect to Teams/ForWorkspace
             if (ws.IsTeamBased)
             {
-                var teams = _teamService.GetByWorkspace(id);
-                ViewBag.Teams = teams;
+                return RedirectToAction("ForWorkspace", "Teams", new { id });
             }
+
+            // else (class-based) ? load tasks & show details normally
+            var tasks = _taskService.GetTasksByWorkspace(id);
+            ViewBag.Tasks = tasks;
 
             return View(ws);
         }
+
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult AssignTask(int workspaceId, string title, string description)
+        {
+            var ws = _workspaces.GetById(workspaceId);
+            if (ws == null) return NotFound();
+
+            _taskService.AssignTask(workspaceId, title, description);
+
+            TempData["Success"] = "Task assigned successfully.";
+            return RedirectToAction("Details", new { id = workspaceId });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult UpdateProgress(int taskId, int progress)
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null) return Unauthorized();
+
+            _taskService.UpdateProgress(taskId, userId.Value, progress);
+
+            TempData["Success"] = "Progress updated successfully.";
+
+            // Redirect using task’s workspace
+            var task = _taskService.GetTaskById(taskId);
+            return RedirectToAction("Details", "Workspaces", new { id = task?.WorkspaceId });
+        }
+
 
     }
 }

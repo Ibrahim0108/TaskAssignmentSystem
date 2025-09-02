@@ -8,7 +8,7 @@ namespace TaskAssignmentSystem.Services.Implementations
     public class WorkspaceService : IWorkspaceService
     {
         private readonly ApplicationDbContext _db;
-        private static readonly string Alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+        private static readonly string Alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789!-*&";
 
         public WorkspaceService(ApplicationDbContext db)
         {
@@ -96,9 +96,18 @@ namespace TaskAssignmentSystem.Services.Implementations
 
             _db.Workspaces.Update(existing);
             _db.SaveChanges();
-            return true; // ✅ return value
+            return true;
         }
 
+        public IEnumerable<Workspace> GetByStudent(int studentId)
+        {
+            // Load all active workspaces into memory, then filter
+            return _db.Workspaces
+                      .Where(w => w.IsActive)
+                      .AsEnumerable() // switch to LINQ-to-Objects
+                      .Where(w => w.MemberUserIds.Contains(studentId))
+                      .ToList();
+        }
 
     }
 }
