@@ -1,6 +1,5 @@
 @model TaskAssignmentSystem.Models.Workspaces.Workspace
 @using TaskAssignmentSystem.Models.Task
-
 @inject TaskAssignmentSystem.Services.Interfaces.IAuthService Auth
 @using Microsoft.AspNetCore.Http
 
@@ -9,98 +8,526 @@
     var role = Context.Session.GetString("UserRole");
 }
 
-<div class="card p-3 mt-2">
-    <div class="d-flex align-items-center">
-        <h3 class="mb-0">Workspace: @Model.Name</h3>
-        @if (!Model.IsActive)
-        {
-            <span class="badge bg-secondary ms-2">Inactive</span>
-        }
-        <div class="ms-auto">
-            <a class="btn btn-outline-secondary btn-sm" href="@Url.Action("Index", "Workspaces")">Back</a>
-            @if (role == "Teacher" || role == "Admin")
+<!-- Full-screen Parent Container -->
+<div class="workspace-page">
+
+    <!-- Left Form Card - Visible on desktop -->
+    @if (role == "Teacher")
+    {
+        <div class="left-card desktop-only">
+            <h2 class="card-title"><i class="fas fa-tasks"></i> Assign New Task</h2>
+            <form method="post" asp-action="AssignTask" class="task-form">
+                <input type="hidden" name="workspaceId" value="@Model.Id" />
+                <div class="form-group">
+                    <label for="taskTitle">Task Title</label>
+                    <input type="text" id="taskTitle" name="title" class="form-control" placeholder="Enter task title" required>
+                </div>
+                <div class="form-group">
+                    <label for="taskDescription">Description</label>
+                    <textarea id="taskDescription" name="description" class="form-control" placeholder="Describe the task details"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-plus-circle"></i> Assign Task
+                </button>
+            </form>
+        </div>
+    }
+
+    <!-- Right Table Card -->
+    <div class="right-card">
+        <div class="card-header">
+            <h2 class="card-title"><i class="fas fa-list-check"></i> Class Tasks</h2>
+            <!-- Mobile-only button to open modal -->
+            @if (role == "Teacher")
             {
-                <a class="btn btn-warning btn-sm ms-2" asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
+                <button class="mobile-task-button mobile-only" id="openTaskModal">
+                    <i class="fas fa-plus"></i> Assign Task
+                </button>
+            }
+        </div>
+
+        <div class="table-container">
+            @if (ViewBag.Tasks == null || !((List<WorkspaceTask>)ViewBag.Tasks).Any())
+            {
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> No tasks yet.
+                </div>
+            }
+            else
+            {
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Description</th>
+                            <th>Progress</th>
+                            @if (role == "Student")
+                            {
+                                <th>Action</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var task in (List<WorkspaceTask>)ViewBag.Tasks)
+                        {
+                            var progress = (task.ProgressUpdates.FirstOrDefault(p => p.StudentId == (int)Context.Session.GetInt32("UserId"))?.ProgressPercent) ?? 0;
+                            <tr>
+                                <td>@task.Title</td>
+                                <td>@task.Description</td>
+                                <td>
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="width:@progress%">@progress%</div>
+                                    </div>
+                                </td>
+                                @if (role == "Student")
+                                {
+                                    <td>
+                                        <form method="post" asp-action="UpdateProgress" asp-controller="Workspaces" class="action-form">
+                                            <input type="hidden" name="taskId" value="@task.Id" />
+                                            <input type="number" name="progress" min="0" max="100" value="@progress" class="form-control-sm">
+                                            <button type="submit" class="btn btn-primary btn-sm">Update</button>
+                                        </form>
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             }
         </div>
     </div>
-    @if (role == "Teacher")
-    {
-        <p class="mt-2">Join Code: <code>@Model.JoinCode</code></p>
-    }
-
-    <hr />
-
-    <div class="mb-3 d-flex gap-2">
-        @if (Model.IsTeamBased)
-        {
-            if (role == "Teacher")
-            {
-                <a class="btn btn-outline-primary" href="@Url.Action("Create", "Teams", new { workspaceId = Model.Id })">Create Team</a>
-            }
-            <a class="btn btn-outline-success" href="@Url.Action("Join", "Teams", new { workspaceId = Model.Id })">Join Team</a>
-        }
-    </div>
-
-    @if (Model.IsTeamBased)
-    {
-        var teams = ViewBag.Teams as List<TaskAssignmentSystem.Models.Teams.Team>;
-    }
-
-    @if (!Model.IsTeamBased)
-    {
-        <h5>Class Tasks</h5>
-        @if (ViewBag.Tasks == null || !((List<WorkspaceTask>)ViewBag.Tasks).Any())
-        {
-            <div class="alert alert-info">No tasks yet.</div>
-        }
-        else
-        {
-            <table class="table table-sm">
-                <thead><tr><th>Title</th><th>Description</th><th>Progress</th><th>Action</th></tr></thead>
-                <tbody>
-                    @foreach (var task in (List<WorkspaceTask>)ViewBag.Tasks)
-                    {
-                        var progress = (task.ProgressUpdates.FirstOrDefault(p => p.StudentId == (int)Context.Session.GetInt32("UserId"))?.ProgressPercent) ?? 0;
-                        <tr>
-                            <td>@task.Title</td>
-                            <td>@task.Description</td>
-                            <td>
-                                <div class="progress" style="height:20px;">
-                                    <div class="progress-bar bg-success" role="progressbar" style="width:@progress%">
-                                        @progress%
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                @if (role == "Student")
-                                {
-                                    <form method="post" asp-action="UpdateProgress" asp-controller="Workspaces">
-                                        <input type="hidden" name="taskId" value="@task.Id" />
-                                        <input type="number" name="progress" min="0" max="100" value="@progress" class="form-control form-control-sm" style="width:80px;display:inline;" />
-                                        <button type="submit" class="btn btn-sm btn-primary">Update</button>
-                                    </form>
-                                }
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
-
-        @if (role == "Teacher")
-        {
-            <form method="post" asp-action="AssignTask">
-                <input type="hidden" name="workspaceId" value="@Model.Id" />
-                <div class="mb-2">
-                    <input type="text" name="title" class="form-control" placeholder="Task title" required />
-                </div>
-                <div class="mb-2">
-                    <textarea name="description" class="form-control" placeholder="Task description"></textarea>
-                </div>
-                <button type="submit" class="btn btn-sm btn-success">Assign Task</button>
-            </form>
-        }
-    }
 
 </div>
+
+<!-- Mobile Modal for Task Assignment -->
+@if (role == "Teacher")
+{
+    <div id="taskModal" class="mobile-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-tasks"></i> Assign New Task</h3>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form method="post" asp-action="AssignTask" class="task-form">
+                    <input type="hidden" name="workspaceId" value="@Model.Id" />
+                    <div class="form-group">
+                        <label for="mobileTaskTitle">Task Title</label>
+                        <input type="text" id="mobileTaskTitle" name="title" class="form-control" placeholder="Enter task title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="mobileTaskDescription">Description</label>
+                        <textarea id="mobileTaskDescription" name="description" class="form-control" placeholder="Describe the task details"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline cancel-btn">Cancel</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-plus-circle"></i> Assign Task
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+    /* Your original desktop styles */
+    .workspace-page {
+        display: grid;
+        grid-template-columns: 35% 65%;
+        width: 1100px;
+        height: 100vh;
+        margin: 0 auto;
+        background: linear-gradient(135deg, #f0f9f0 0%, #e8f5e8 100%);
+        gap: 25px;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+    .left-card {
+        height: 500px;
+        background: #fff;
+        border-radius: 20px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(34,197,94,0.1), 0 4px 15px rgba(0,0,0,0.05);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .right-card {
+        height: 500px;
+        background: #fff;
+        border-radius: 20px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(34,197,94,0.1), 0 4px 15px rgba(0,0,0,0.05);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .card-title {
+        font-size: 24px;
+        font-weight: 600;
+        color: #15803d;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .table-container {
+        flex-grow: 1;
+        overflow-y: hidden;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 16px 20px;
+        text-align: left;
+        border-bottom: 1px solid rgba(34,197,94,0.1);
+    }
+
+    th {
+        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        color: #15803d;
+        font-weight: 600;
+    }
+
+    tr:hover {
+        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    }
+
+    .progress-container {
+        width: 100%;
+        background: #f3f4f6;
+        border-radius: 10px;
+        overflow: hidden;
+        height: 20px;
+    }
+
+    .progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        color: white;
+        font-weight: 600;
+        transition: width 0.5s ease;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+    .form-control, textarea.form-control {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid rgba(34,197,94,0.15);
+        border-radius: 10px;
+        font-size: 14px;
+    }
+
+    textarea.form-control {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
+        border-color: #15803d;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #15803d 0%, #14532d 100%);
+        }
+
+    /* Mobile-specific styles */
+    .mobile-only {
+        display: none;
+    }
+
+    .desktop-only {
+        display: block;
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .mobile-task-button {
+        background: #22c55e;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 15px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    /* Mobile Modal */
+    .mobile-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-content {
+        background-color: white;
+        border-radius: 15px;
+        width: 90%;
+        max-width: 500px;
+        max-height: 80vh;
+        overflow-y: auto;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .modal-header {
+        padding: 15px 20px;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        .modal-header h3 {
+            color: #15803d;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+    .close-modal {
+        font-size: 24px;
+        cursor: pointer;
+        color: #6b7280;
+    }
+
+    .modal-body {
+        padding: 20px;
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .btn-outline {
+        background: transparent;
+        color: #6b7280;
+        border: 1px solid #d1d5db;
+        padding: 10px 15px;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+    /* Responsive styles */
+    @@media (max-width: 1024px) {
+        .workspace-page {
+            grid-template-columns: 1fr;
+            width: 100%;
+            height: auto;
+            padding: 15px;
+            gap: 15px;
+        }
+
+        .left-card, .right-card {
+            height: auto;
+            width: 100%;
+        }
+
+        .desktop-only {
+            display: none;
+        }
+
+        .mobile-only {
+            display: flex;
+        }
+
+        table {
+            display: block;
+            overflow-x: auto;
+        }
+
+        .card-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .mobile-task-button {
+            align-self: flex-end;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .workspace-page {
+            padding: 10px;
+        }
+
+        .left-card, .right-card {
+            padding: 15px;
+            border-radius: 15px;
+        }
+
+        .card-title {
+            font-size: 20px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+        }
+
+        .progress-container {
+            height: 18px;
+        }
+
+        .progress-bar {
+            font-size: 11px;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .right-card {
+            padding: 12px;
+        }
+
+        .card-title {
+            font-size: 18px;
+        }
+
+        th, td {
+            padding: 10px 12px;
+            font-size: 14px;
+        }
+
+        .action-form {
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-control-sm {
+            width: 70px;
+        }
+
+        .modal-content {
+            width: 95%;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Mobile modal functionality
+        const modal = document.getElementById('taskModal');
+        const openBtn = document.getElementById('openTaskModal');
+        const closeBtn = document.querySelector('.close-modal');
+        const cancelBtn = document.querySelector('.cancel-btn');
+
+        if (openBtn) {
+            openBtn.addEventListener('click', function() {
+                if (modal) modal.style.display = 'flex';
+            });
+        }
+
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function() {
+                if (modal) modal.style.display = 'none';
+            });
+        }
+
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', function() {
+                if (modal) modal.style.display = 'none';
+            });
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        // Original functionality
+        const progressBars = document.querySelectorAll('.progress-bar');
+        progressBars.forEach(bar => {
+            const width = bar.style.width;
+            bar.style.width = '0';
+            setTimeout(() => {
+                bar.style.transition = 'width 1s ease-in-out';
+                bar.style.width = width;
+            }, 300);
+        });
+
+        // Task form submit
+        const taskForms = document.querySelectorAll('.task-form');
+        taskForms.forEach(form => {
+            form.addEventListener('submit', function(e) {
+                const titleInput = this.querySelector('input[type="text"]');
+                if (titleInput.value.trim() === '') {
+                    alert('Please enter a task title');
+                    titleInput.focus();
+                    e.preventDefault();
+                    return;
+                }
+                const submitBtn = this.querySelector('button[type="submit"]');
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Assigning...';
+                submitBtn.disabled = true;
+            });
+        });
+
+        // Progress update buttons
+        const updateButtons = document.querySelectorAll('.action-form button');
+        updateButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                const input = this.parentElement.querySelector('input');
+                const newValue = parseInt(input.value);
+                if (isNaN(newValue) || newValue < 0 || newValue > 100) {
+                    alert('Please enter a valid progress value between 0 and 100');
+                    e.preventDefault();
+                    return;
+                }
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                this.disabled = true;
+            });
+        });
+    });
+</script>

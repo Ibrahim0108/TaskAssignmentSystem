@@ -4,11 +4,16 @@
     var students = ViewBag.Students as List<TaskAssignmentSystem.Models.Users.User>;
 }
 
+<div class="container">
+<div class="card">
+    <h2>Create New Team</h2>
 <form method="post" asp-action="Create">
+
+ 
     <input type="hidden" name="workspaceId" value="@workspaceId" />
     <div class="mb-3">
         <label class="form-label">Team Name</label>
-        <input name="name" class="form-control" required />
+        <input name="name" class="form-control" required placeholder="Enter team name..." />
     </div>
 
     <div class="mb-3">
@@ -39,8 +44,15 @@
         </select>
     </div>
 
-    <button class="btn btn-primary" type="submit">Create</button>
+    <button class="btn btn-primary" type="submit">Create Team</button>
 </form>
+
+<div class="success-message" id="successMessage">
+    ?? Team created successfully!
+</div>
+    </div>
+</div>
+
 
 @section Scripts {
     <script>
@@ -59,3 +71,675 @@
         });
     </script>
 }
+
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #f8fffe 0%, #f0fdf4 100%);
+        min-height: 100vh;
+        padding: 40px 20px;
+        line-height: 1.6;
+    }
+
+    /* Container */
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    /* Card Container */
+    .card {
+        background: linear-gradient(145deg, #ffffff 0%, #fefffe 100%);
+        border: 1px solid rgba(34, 197, 94, 0.08);
+        border-radius: 24px;
+        box-shadow: 0 25px 60px rgba(34, 197, 94, 0.06), 0 15px 40px rgba(0, 0, 0, 0.03);
+        position: relative;
+        overflow: hidden;
+        transition: all 0.4s ease;
+        animation: slideUp 0.8s ease-out;
+        padding: 40px;
+    }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #22c55e 0%, #16a34a 50%, #15803d 100%);
+        }
+
+    @@keyframes slideUp {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+
+    /* Typography */
+    h2 {
+        color: #15803d;
+        font-size: 32px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+        margin-bottom: 32px;
+        position: relative;
+        padding-left: 50px;
+        animation: fadeInLeft 0.6s ease-out 0.2s both;
+        text-align: center;
+    }
+
+        h2::before {
+            content: '??';
+            position: absolute;
+            left: 50%;
+            top: -40px;
+            transform: translateX(-50%);
+            font-size: 40px;
+            animation: bounce 2s infinite;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 3px;
+            background: linear-gradient(90deg, #22c55e, #15803d);
+            border-radius: 2px;
+        }
+
+    @@keyframes fadeInLeft {
+        from
+
+    {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    }
+
+    @@keyframes bounce {
+        0%, 20%, 50%, 80%, 100%
+
+    {
+        transform: translateX(-50%) translateY(0);
+    }
+
+    40% {
+        transform: translateX(-50%) translateY(-8px);
+    }
+
+    60% {
+        transform: translateX(-50%) translateY(-4px);
+    }
+
+    }
+
+    /* Form Styling */
+    form {
+        animation: fadeIn 0.8s ease-out 0.4s both;
+    }
+
+    @@keyframes fadeIn {
+        from
+
+    {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+
+    }
+
+    /* Spacing */
+    .mb-3 {
+        margin-bottom: 24px;
+        position: relative;
+    }
+
+    /* Label Styling */
+    .form-label {
+        display: block;
+        margin-bottom: 12px;
+        color: #374151;
+        font-weight: 600;
+        font-size: 16px;
+        letter-spacing: 0.3px;
+        position: relative;
+        padding-left: 30px;
+    }
+
+        .form-label::before {
+            position: absolute;
+            left: 0;
+            top: 0;
+            font-size: 18px;
+        }
+
+        .form-label:nth-of-type(1)::before {
+            content: '???';
+        }
+
+        .form-label:nth-of-type(2)::before {
+            content: '??';
+        }
+
+        .form-label:nth-of-type(3)::before {
+            content: '?????';
+        }
+
+        .form-label:nth-of-type(4)::before {
+            content: '?????';
+        }
+
+    /* Input Styling */
+    .form-control, .form-select {
+        width: 100%;
+        padding: 16px 20px;
+        border: 2px solid rgba(34, 197, 94, 0.15);
+        border-radius: 16px;
+        font-size: 16px;
+        font-weight: 500;
+        color: #374151;
+        background: linear-gradient(145deg, #ffffff 0%, #f9fafb 100%);
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(34, 197, 94, 0.05);
+    }
+
+        .form-control:focus, .form-select:focus {
+            outline: none;
+            border-color: #22c55e;
+            box-shadow: 0 0 0 6px rgba(34, 197, 94, 0.08), 0 8px 24px rgba(34, 197, 94, 0.15);
+            background: linear-gradient(145deg, #f0fdf4 0%, #dcfce7 100%);
+            transform: translateY(-2px) scale(1.01);
+        }
+
+        .form-control:hover, .form-select:hover {
+            border-color: #16a34a;
+            background: linear-gradient(145deg, #f0fdf4 0%, #dcfce7 100%);
+            transform: translateY(-1px);
+        }
+
+        .form-control::placeholder {
+            color: #9ca3af;
+            font-style: italic;
+        }
+
+    /* Select Styling */
+    .form-select {
+        cursor: pointer;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2322c55e' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 16px center;
+        background-size: 16px;
+        padding-right: 50px;
+    }
+
+        .form-select option {
+            padding: 12px;
+            background: white;
+            color: #374151;
+        }
+
+            .form-select option:hover {
+                background: #f0fdf4;
+            }
+
+    /* Button Styling */
+    .btn {
+        padding: 16px 32px;
+        border-radius: 16px;
+        font-weight: 600;
+        font-size: 18px;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        border: 2px solid;
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+        min-width: 160px;
+        margin-top: 16px;
+    }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
+        border-color: #15803d;
+        color: white;
+        box-shadow: 0 8px 25px rgba(34, 197, 94, 0.3);
+    }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #15803d 0%, #14532d 100%);
+            border-color: #14532d;
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(34, 197, 94, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-primary:active {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.3);
+        }
+
+    /* Dynamic Form Sections */
+    .form-section {
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+    }
+
+        .form-section.hidden {
+            opacity: 0;
+            max-height: 0;
+            margin-bottom: 0;
+            transform: translateY(-20px);
+        }
+
+        .form-section.visible {
+            opacity: 1;
+            max-height: 200px;
+            margin-bottom: 24px;
+            transform: translateY(0);
+        }
+
+    /* Validation Styling */
+    .form-control:valid:not(:placeholder-shown) {
+        border-color: #22c55e;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2322c55e' d='m2.3 6.73.94-.94 2.94 2.94L7.83 7.09 8.77 8.03 5.24 11.56z'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 20px center;
+        background-size: 20px;
+        padding-right: 60px;
+    }
+
+    .form-control:invalid:not(:placeholder-shown) {
+        border-color: #ef4444;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23ef4444'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath d='m5.8 4.6 2.4 2.4M8.2 4.6l-2.4 2.4'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 20px center;
+        background-size: 20px;
+        padding-right: 60px;
+    }
+
+    /* Success Message */
+    .success-message {
+        background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+        color: #15803d;
+        padding: 20px 24px;
+        border-radius: 16px;
+        margin-top: 24px;
+        text-align: center;
+        font-weight: 600;
+        border: 2px solid #22c55e;
+        animation: slideDown 0.5s ease-out;
+        display: none;
+    }
+
+    @@keyframes slideDown {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+
+    /* Back Button */
+    .back-button {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        background: rgba(255, 255, 255, 0.9);
+        border: 2px solid rgba(34, 197, 94, 0.2);
+        border-radius: 12px;
+        padding: 12px 20px;
+        color: #15803d;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+    }
+
+        .back-button:hover {
+            background: rgba(240, 253, 244, 0.95);
+            border-color: #22c55e;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(34, 197, 94, 0.2);
+            text-decoration: none;
+            color: #15803d;
+        }
+
+        .back-button::before {
+            content: '? ';
+            margin-right: 8px;
+        }
+
+    /* Responsive Design */
+    @@media (max-width: 768px) {
+        body
+
+    {
+        padding: 20px 15px;
+    }
+
+    .card {
+        padding: 24px;
+    }
+
+    h2 {
+        font-size: 26px;
+        padding-left: 0;
+    }
+
+        h2::before {
+            font-size: 32px;
+            top: -35px;
+        }
+
+    .form-control, .form-select {
+        padding: 14px 16px;
+        font-size: 15px;
+    }
+
+    .btn {
+        padding: 14px 24px;
+        font-size: 16px;
+        width: 100%;
+    }
+
+    .back-button {
+        position: static;
+        display: block;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    }
+
+    @@media (max-width: 576px) {
+        h2
+
+    {
+        font-size: 22px;
+    }
+
+    h2::before {
+        font-size: 28px;
+        top: -30px;
+    }
+
+    h2::after {
+        width: 160px;
+    }
+
+    .card {
+        padding: 20px;
+    }
+
+    .form-control, .form-select {
+        font-size: 14px;
+    }
+
+    }
+
+    /* Loading States */
+    .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none !important;
+    }
+
+    /* Animation Delays */
+    .mb-3:nth-child(1) {
+        animation: fadeInUp 0.6s ease-out 0.1s both;
+    }
+
+    .mb-3:nth-child(2) {
+        animation: fadeInUp 0.6s ease-out 0.2s both;
+    }
+
+    .mb-3:nth-child(3) {
+        animation: fadeInUp 0.6s ease-out 0.3s both;
+    }
+
+    .mb-3:nth-child(4) {
+        animation: fadeInUp 0.6s ease-out 0.4s both;
+    }
+
+    .btn {
+        animation: fadeInUp 0.6s ease-out 0.5s both;
+    }
+
+    @@keyframes fadeInUp {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+
+    /* Highlight effect for active section */
+    .form-section.highlight {
+        background: linear-gradient(135deg, rgba(240, 253, 244, 0.5) 0%, rgba(220, 252, 231, 0.3) 100%);
+        border-radius: 16px;
+        padding: 20px;
+        margin: -10px -20px 14px -20px;
+        border: 1px solid rgba(34, 197, 94, 0.1);
+    }
+</style>
+
+<script>
+    // Handle leader type change
+    document.getElementById('leaderType').addEventListener('change', function() {
+        const teacherDropdown = document.getElementById('teacherDropdown');
+        const studentDropdown = document.getElementById('studentDropdown');
+        const selectedValue = this.value;
+
+        // Remove highlight from both sections
+        teacherDropdown.classList.remove('highlight');
+        studentDropdown.classList.remove('highlight');
+
+        if (selectedValue === 'Teacher') {
+            // Show teacher dropdown, hide student dropdown
+            teacherDropdown.classList.remove('hidden');
+            teacherDropdown.classList.add('visible');
+            studentDropdown.classList.remove('visible');
+            studentDropdown.classList.add('hidden');
+
+            // Highlight teacher section
+            setTimeout(() => {
+                teacherDropdown.classList.add('highlight');
+            }, 300);
+
+            // Clear student selection
+            studentDropdown.querySelector('select').selectedIndex = 0;
+        } else {
+            // Show student dropdown, hide teacher dropdown
+            studentDropdown.classList.remove('hidden');
+            studentDropdown.classList.add('visible');
+            teacherDropdown.classList.remove('visible');
+            teacherDropdown.classList.add('hidden');
+
+            // Highlight student section
+            setTimeout(() => {
+                studentDropdown.classList.add('highlight');
+            }, 300);
+
+            // Clear teacher selection
+            teacherDropdown.querySelector('select').selectedIndex = 0;
+        }
+    });
+
+    // Form submission handling
+    document.querySelector('form').addEventListener('submit', function(e) {
+
+        const submitBtn = this.querySelector('.btn-primary');
+        const teamNameInput = this.querySelector('input[name="name"]');
+        const leaderTypeSelect = this.querySelector('#leaderType');
+        const successMsg = document.getElementById('successMessage');
+        const originalText = submitBtn.textContent;
+
+        // Validate team name
+        if (!teamNameInput.value.trim()) {
+            teamNameInput.focus();
+            teamNameInput.style.borderColor = '#ef4444';
+            return;
+        }
+
+        // Show loading state
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '? Creating Team...';
+
+        // Simulate form processing
+        setTimeout(() => {
+            const teamName = teamNameInput.value.trim();
+            const leaderType = leaderTypeSelect.value;
+            const leaderSelect = leaderType === 'Teacher' ?
+                document.querySelector('select[name="teacherUserId"]') :
+                document.querySelector('select[name="studentUserId"]');
+            const leaderName = leaderSelect.options[leaderSelect.selectedIndex].text.split(' (')[0];
+
+            // Show success state
+            submitBtn.innerHTML = '? Team Created!';
+            submitBtn.style.background = 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)';
+            submitBtn.style.borderColor = '#16a34a';
+
+            successMsg.innerHTML = `?? Team "${teamName}" created successfully with ${leaderName} as ${leaderType} leader!`;
+            successMsg.style.display = 'block';
+
+            // Add celebration effect
+            this.style.background = 'linear-gradient(135deg, rgba(220, 252, 231, 0.3) 0%, rgba(187, 247, 208, 0.2) 100%)';
+            this.style.borderRadius = '20px';
+            this.style.padding = '30px';
+            this.style.margin = '-10px';
+            this.style.border = '2px solid rgba(34, 197, 94, 0.2)';
+
+            // Redirect after success
+            setTimeout(() => {
+                window.location.href = '#'; // Would redirect to team details or workspace
+            }, 3000);
+
+        }, 2500);
+    });
+
+    // Real-time validation for team name
+    document.querySelector('input[name="name"]').addEventListener('input', function() {
+        const value = this.value.trim();
+
+        if (value.length >= 3) {
+            this.style.borderColor = '#22c55e';
+            this.style.background = 'linear-gradient(145deg, #f0fdf4 0%, #dcfce7 100%)';
+        } else if (value.length > 0) {
+            this.style.borderColor = '#f59e0b';
+            this.style.background = 'linear-gradient(145deg, #fffbeb 0%, #fef3c7 100%)';
+        } else {
+            this.style.borderColor = 'rgba(34, 197, 94, 0.15)';
+            this.style.background = 'linear-gradient(145deg, #ffffff 0%, #f9fafb 100%)';
+        }
+    });
+
+    // Add ripple effect to buttons
+    document.querySelectorAll('.btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            const ripple = document.createElement('span');
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+
+            ripple.style.cssText = `
+                position: absolute;
+                width: ${size}px;
+                height: ${size}px;
+                left: ${x}px;
+                top: ${y}px;
+                background: rgba(255, 255, 255, 0.3);
+                border-radius: 50%;
+                transform: scale(0);
+                animation: ripple 0.6s ease-out;
+                pointer-events: none;
+            `;
+
+            this.appendChild(ripple);
+
+            setTimeout(() => ripple.remove(), 600);
+        });
+    });
+
+    // Auto-focus on team name input
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(() => {
+            document.querySelector('input[name="name"]').focus();
+        }, 800);
+    });
+
+    // Add CSS for ripple animation
+    const style = document.createElement('style');
+    style.textContent = `
+        @@keyframes ripple {
+            to {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+</script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9794d9f1107a6f7a',t:'MTc1Njg5ODM1OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+

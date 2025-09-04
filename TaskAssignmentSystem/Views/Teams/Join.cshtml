@@ -2,22 +2,714 @@
     ViewData["Title"] = "Join Team";
 }
 <div class="container mt-4" style="max-width:520px;">
+    <div class="card">
     <h3>Join Team</h3>
     <hr />
+
+
     @if (TempData["Error"] != null)
     {
-        <div class="alert alert-danger">@TempData["Error"]</div>
+        <div class="alert alert-danger" id="errorAlert" style="display: none;">
+            <strong>? Error:</strong> <span id="errorMessage"></span>
+        </div>
     }
     @if (TempData["Success"] != null)
     {
-        <div class="alert alert-success">@TempData["Success"]</div>
+        <div class="alert alert-success" id="successAlert" style="display: none;">
+            <strong>? Success:</strong> <span id="successMessage"></span>
+        </div>
     }
     <form method="post" asp-action="Join">
         <div class="mb-3">
             <label class="form-label">Team Join Code</label>
-            <input name="code" class="form-control" required />
+            <input name="code" class="form-control" required placeholder="Enter team join code..." />
         </div>
-        <button class="btn btn-primary" type="submit">Join</button>
-        <a class="btn btn-link" href="/Workspaces">Back</a>
+
+        <div class="help-text">
+            Enter the unique code provided by your team leader
+        </div>
+        <button class="btn btn-primary" type="submit" id="joinButton">Join Team</button>
+            <a class="btn btn-outline-secondary" href="/Workspaces">Back</a>
     </form>
 </div>
+</div>
+                    
+
+
+<style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f8fffe 0%, #f0fdf4 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            line-height: 1.6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Container */
+        .container {
+            max-width: 520px;
+            width: 100%;
+        }
+
+        /* Card Container */
+        .card {
+            background: linear-gradient(145deg, #ffffff 0%, #fefffe 100%);
+            border: 1px solid rgba(34, 197, 94, 0.08);
+            border-radius: 24px;
+            box-shadow: 
+                0 25px 60px rgba(34, 197, 94, 0.06),
+                0 15px 40px rgba(0, 0, 0, 0.03);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            animation: slideUp 0.8s ease-out;
+            padding: 40px;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #22c55e 0%, #16a34a 50%, #15803d 100%);
+        }
+
+        @@keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Typography */
+        h3 {
+            color: #15803d;
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 32px;
+            position: relative;
+            padding-left: 50px;
+            animation: fadeInLeft 0.6s ease-out 0.2s both;
+            text-align: center;
+        }
+
+        h3::before {
+            content: '??';
+            position: absolute;
+            left: 22%;
+            top: -2px;
+            transform: translateX(-50%);
+            font-size: 32px;
+            animation: bounce 2s infinite;
+        }
+
+        h3::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, #22c55e, #15803d);
+            border-radius: 2px;
+        }
+
+        @@keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @@keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+            40% { transform: translateX(-50%) translateY(-6px); }
+            60% { transform: translateX(-50%) translateY(-3px); }
+        }
+
+        /* HR Styling */
+        hr {
+            border: none;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(34, 197, 94, 0.2), transparent);
+            margin: 24px 0 32px 0;
+            animation: fadeIn 0.8s ease-out 0.4s both;
+        }
+
+        /* Form Styling */
+        form {
+            animation: fadeIn 0.8s ease-out 0.6s both;
+        }
+
+        @@keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Spacing */
+        .mb-3 {
+            margin-bottom: 32px;
+            position: relative;
+        }
+
+        /* Label Styling */
+        .form-label {
+            display: block;
+            margin-bottom: 12px;
+            color: #374151;
+            font-weight: 600;
+            font-size: 16px;
+            letter-spacing: 0.3px;
+            position: relative;
+            padding-left: 35px;
+        }
+
+        .form-label::before {
+            content: '??';
+            position: absolute;
+            left: 0;
+            top: 0;
+            font-size: 18px;
+        }
+
+        /* Input Styling */
+        .form-control {
+            width: 100%;
+            padding: 20px 24px;
+            border: 2px solid rgba(34, 197, 94, 0.15);
+            border-radius: 16px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #374151;
+            background: linear-gradient(145deg, #ffffff 0%, #f9fafb 100%);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.05);
+            text-align: center;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-family: 'Courier New', monospace;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #22c55e;
+            box-shadow: 
+                0 0 0 6px rgba(34, 197, 94, 0.08),
+                0 8px 24px rgba(34, 197, 94, 0.15);
+            background: linear-gradient(145deg, #f0fdf4 0%, #dcfce7 100%);
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        .form-control:hover {
+            border-color: #16a34a;
+            background: linear-gradient(145deg, #f0fdf4 0%, #dcfce7 100%);
+            transform: translateY(-1px);
+        }
+
+        .form-control::placeholder {
+            color: #9ca3af;
+            font-style: italic;
+            letter-spacing: 1px;
+            text-transform: none;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Validation States */
+        .form-control.valid {
+            border-color: #22c55e;
+            background: linear-gradient(145deg, #f0fdf4 0%, #dcfce7 100%);
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2322c55e' d='m2.3 6.73.94-.94 2.94 2.94L7.83 7.09 8.77 8.03 5.24 11.56z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 24px center;
+            background-size: 24px;
+            padding-right: 60px;
+        }
+
+        .form-control.invalid {
+            border-color: #ef4444;
+            background: linear-gradient(145deg, #fef2f2 0%, #fecaca 100%);
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23ef4444'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath d='m5.8 4.6 2.4 2.4M8.2 4.6l-2.4 2.4'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 24px center;
+            background-size: 24px;
+            padding-right: 60px;
+        }
+
+        /* Button Styling */
+        .btn {
+            padding: 18px 36px;
+            border-radius: 16px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            border: 2px solid;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            min-width: 140px;
+            margin-right: 16px;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
+            border-color: #15803d;
+            color: white;
+            box-shadow: 0 8px 25px rgba(34, 197, 94, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #15803d 0%, #14532d 100%);
+            border-color: #14532d;
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(34, 197, 94, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .btn-link {
+            background: transparent;
+            border-color: transparent;
+            color: #6b7280;
+            box-shadow: none;
+            text-decoration: underline;
+        }
+
+        .btn-link:hover {
+            background: transparent;
+            border-color: transparent;
+            color: #374151;
+            transform: translateY(-2px);
+            text-decoration: none;
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        /* Alert Styling */
+        .alert {
+            padding: 20px 24px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            font-weight: 500;
+            border: 2px solid;
+            position: relative;
+            animation: slideDown 0.5s ease-out;
+        }
+
+        .alert-danger {
+            background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+            border-color: #ef4444;
+            color: #dc2626;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border-color: #22c55e;
+            color: #15803d;
+        }
+
+        @@keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Help Text */
+        .help-text {
+            font-size: 14px;
+            color: #6b7280;
+            margin-top: 12px;
+        margin-bottom: 12px;
+            text-align: center;
+            font-style: italic;
+            animation: fadeIn 0.8s ease-out 0.8s both;
+        }
+
+        /* Code Format Examples */
+        .code-examples {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 1px solid rgba(34, 197, 94, 0.1);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 16px;
+            animation: fadeIn 0.8s ease-out 1.0s both;
+        }
+
+        .code-examples h5 {
+            color: #374151;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .code-examples .example {
+            display: inline-block;
+            background: white;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 6px;
+            padding: 4px 8px;
+            margin: 2px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #15803d;
+            font-weight: 600;
+        }
+
+        /* Responsive Design */
+        @@media (max-width: 768px) {
+            body {
+                padding: 20px 15px;
+            }
+
+            .card {
+                padding: 24px;
+            }
+
+            h3 {
+                font-size: 26px;
+                padding-left: 0;
+            }
+
+            h3::before {
+                position: static;
+                display: block;
+                margin-bottom: 8px;
+                transform: none;
+            }
+
+            .form-control {
+                padding: 16px 20px;
+                font-size: 16px;
+            }
+
+            .btn {
+                padding: 16px 28px;
+                font-size: 15px;
+                width: 100%;
+                margin-bottom: 12px;
+                margin-right: 0;
+            }
+        }
+
+        @@media (max-width: 576px) {
+            h3 {
+                font-size: 22px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .form-control {
+                font-size: 14px;
+                letter-spacing: 1px;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @@keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Success State Animation */
+        .success-state {
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+            border-color: #22c55e;
+            transform: scale(1.02);
+            animation: successPulse 0.6s ease-out;
+        }
+
+        @@keyframes successPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1.02); }
+        }
+    </style>
+
+
+
+<script>
+    const joinCodeInput = document.getElementById('joinCode');
+    const joinButton = document.getElementById('joinButton');
+    const joinForm = document.getElementById('joinForm');
+    const errorAlert = document.getElementById('errorAlert');
+    const successAlert = document.getElementById('successAlert');
+    const errorMessage = document.getElementById('errorMessage');
+    const successMessage = document.getElementById('successMessage');
+
+    // Sample team codes for validation
+    const validCodes = [
+        'DEV-2024-001',
+        'DES-2024-002',
+        'RES-2024-003',
+        'TEST-2024-004',
+        'MKT-2024-005'
+    ];
+
+    // Auto-format join code as user types
+    joinCodeInput.addEventListener('input', function(e) {
+        let value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+
+        // Format as XXX-XXXX-XXX
+        if (value.length > 3) {
+            value = value.substring(0, 3) + '-' + value.substring(3);
+        }
+        if (value.length > 8) {
+            value = value.substring(0, 8) + '-' + value.substring(8);
+        }
+        if (value.length > 12) {
+            value = value.substring(0, 12);
+        }
+
+        e.target.value = value;
+
+        // Real-time validation
+        validateCode(value);
+    });
+
+    // Validate join code
+    function validateCode(code) {
+        const input = joinCodeInput;
+
+        if (code.length === 0) {
+            input.className = 'form-control';
+            return;
+        }
+
+        if (code.length >= 11 && validCodes.includes(code)) {
+            input.className = 'form-control valid';
+            hideAlert();
+        } else if (code.length >= 11) {
+            input.className = 'form-control invalid';
+            showError('Invalid join code format or code not found');
+        } else {
+            input.className = 'form-control';
+        }
+    }
+
+    // Form submission
+    joinForm.addEventListener('submit', function(e) {
+
+        const code = joinCodeInput.value.trim();
+
+        if (!code) {
+            showError('Please enter a team join code');
+            joinCodeInput.focus();
+            return;
+        }
+
+        if (code.length < 11) {
+            showError('Join code must be in format: XXX-XXXX-XXX');
+            joinCodeInput.focus();
+            return;
+        }
+
+        if (!validCodes.includes(code)) {
+            showError('Invalid join code. Please check with your team leader.');
+            joinCodeInput.focus();
+            return;
+        }
+
+        // Show loading state
+        const originalText = joinButton.innerHTML;
+        joinButton.disabled = true;
+        joinButton.innerHTML = '<span class="loading"></span> Joining Team...';
+
+        // Simulate joining process
+        setTimeout(() => {
+            // Success!
+            const teamName = getTeamName(code);
+            showSuccess(`Successfully joined "${teamName}"! Redirecting to team dashboard...`);
+
+            // Add success state to form
+            joinForm.classList.add('success-state');
+            joinCodeInput.classList.add('success-state');
+
+            joinButton.innerHTML = '? Joined Successfully!';
+            joinButton.style.background = 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)';
+
+            // Simulate redirect
+            setTimeout(() => {
+                showSuccess('Redirecting to your team dashboard...');
+                setTimeout(() => {
+                    // In a real app, this would redirect to the team page
+                    alert('Redirecting to team dashboard...');
+                }, 1500);
+            }, 2000);
+
+        }, 2500);
+    });
+
+    // Get team name from code
+    function getTeamName(code) {
+        const teamNames = {
+            'DEV-2024-001': 'Development Team Alpha',
+            'DES-2024-002': 'Design Team Beta',
+            'RES-2024-003': 'Research Team Gamma',
+            'TEST-2024-004': 'Testing Team Delta',
+            'MKT-2024-005': 'Marketing Team Epsilon'
+        };
+        return teamNames[code] || 'Unknown Team';
+    }
+
+    // Show error alert
+    function showError(message) {
+        errorMessage.textContent = message;
+        errorAlert.style.display = 'block';
+        successAlert.style.display = 'none';
+        errorAlert.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // Show success alert
+    function showSuccess(message) {
+        successMessage.textContent = message;
+        successAlert.style.display = 'block';
+        errorAlert.style.display = 'none';
+        successAlert.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // Hide alerts
+    function hideAlert() {
+        errorAlert.style.display = 'none';
+        successAlert.style.display = 'none';
+    }
+
+    // Add ripple effect to buttons
+    document.querySelectorAll('.btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            if (this.disabled) return;
+
+            const ripple = document.createElement('span');
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+
+            ripple.style.cssText = `
+                position: absolute;
+                width: ${size}px;
+                height: ${size}px;
+                left: ${x}px;
+                top: ${y}px;
+                background: rgba(255, 255, 255, 0.3);
+                border-radius: 50%;
+                transform: scale(0);
+                animation: ripple 0.6s ease-out;
+                pointer-events: none;
+            `;
+
+            this.appendChild(ripple);
+
+            setTimeout(() => ripple.remove(), 600);
+        });
+    });
+
+    // Focus on input when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(() => {
+            joinCodeInput.focus();
+        }, 800);
+    });
+
+    // Add CSS for ripple animation
+    const style = document.createElement('style');
+    style.textContent = `
+        @@keyframes ripple {
+            to {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+
+    // Animate code examples on hover
+    document.querySelectorAll('.example').forEach(example => {
+        example.addEventListener('click', function() {
+            joinCodeInput.value = this.textContent;
+            joinCodeInput.focus();
+            validateCode(this.textContent);
+
+            // Add highlight effect
+            this.style.background = 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)';
+            this.style.transform = 'scale(1.05)';
+
+            setTimeout(() => {
+                this.style.background = '';
+                this.style.transform = '';
+            }, 300);
+        });
+
+        example.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 4px 12px rgba(34, 197, 94, 0.2)';
+        });
+
+        example.addEventListener('mouseleave', function() {
+            this.style.transform = '';
+            this.style.boxShadow = '';
+        });
+    });
+</script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97951b9da37b6f7a',t:'MTc1NjkwMTA0OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>

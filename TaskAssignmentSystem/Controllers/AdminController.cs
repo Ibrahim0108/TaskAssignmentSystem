@@ -62,7 +62,10 @@ namespace TaskAssignmentSystem.Controllers
             }
 
             var pending = _context.Users.Where(u => !u.IsApproved).ToList();
-            var all = _context.Users.ToList();
+            var all = _context.Users
+    .Where(u => u.Role == Role.Admin || u.Role == Role.Teacher)
+    .ToList();
+
 
             var model = new
             {

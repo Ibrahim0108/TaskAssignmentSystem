@@ -123,3 +123,737 @@ else
         </div>
     </div>
 }
+
+
+
+
+
+
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #f8fffe 0%, #f0fdf4 100%);
+        min-height: 100vh;
+        padding: 40px 20px;
+        line-height: 1.6;
+    }
+
+    /* Container */
+    .container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    /* Header Section */
+    .header-section {
+        margin-bottom: 32px;
+        animation: slideDown 0.8s ease-out;
+    }
+
+    @@keyframes slideDown {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+
+    /* Flexbox utilities */
+    .d-flex {
+        display: flex;
+    }
+
+    .align-items-center {
+        align-items: center;
+    }
+
+    .mb-3 {
+        margin-bottom: 24px;
+    }
+
+    .mb-0 {
+        margin-bottom: 0;
+    }
+
+    .ms-auto {
+        margin-left: auto;
+    }
+
+    .gap-2 {
+        gap: 16px;
+    }
+
+    .text-end {
+        text-align: right;
+    }
+
+    /* Typography */
+    h3 {
+        color: #15803d;
+        font-size: 32px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+        position: relative;
+        padding-left: 50px;
+    }
+
+        h3::before {
+            content: '🏢';
+            position: absolute;
+            left: 0;
+            top: -2px;
+            font-size: 32px;
+            animation: pulse 2s infinite;
+        }
+
+        h3::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50px;
+            width: 160px;
+            height: 3px;
+            background: linear-gradient(90deg, #22c55e, #15803d);
+            border-radius: 2px;
+        }
+
+    @@keyframes pulse {
+        0%, 100%
+
+    {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    }
+
+    /* Button Styling */
+    .btn {
+        padding: 12px 24px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        border: 2px solid;
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+    }
+
+    .btn-sm {
+        padding: 8px 16px;
+        font-size: 13px;
+    }
+
+    .btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.6s ease;
+    }
+
+    .btn:hover::before {
+        left: 100%;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
+        border-color: #15803d;
+        color: white;
+        box-shadow: 0 4px 16px rgba(34, 197, 94, 0.25);
+    }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #15803d 0%, #14532d 100%);
+            border-color: #14532d;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.35);
+            color: white;
+            text-decoration: none;
+        }
+
+    .btn-outline-secondary {
+        background: transparent;
+        color: #6b7280;
+        border-color: #d1d5db;
+        box-shadow: 0 2px 8px rgba(107, 114, 128, 0.1);
+    }
+
+        .btn-outline-secondary:hover {
+            background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+            border-color: #9ca3af;
+            color: #374151;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(107, 114, 128, 0.2);
+            text-decoration: none;
+        }
+
+    .btn-outline-primary {
+        background: transparent;
+        color: #22c55e;
+        border-color: #22c55e;
+        box-shadow: 0 2px 8px rgba(34, 197, 94, 0.1);
+    }
+
+        .btn-outline-primary:hover {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border-color: #16a34a;
+            color: #15803d;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
+            text-decoration: none;
+        }
+
+    .btn-secondary {
+        background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+        border-color: #4b5563;
+        color: white;
+        box-shadow: 0 2px 8px rgba(107, 114, 128, 0.2);
+    }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
+            border-color: #374151;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
+            color: white;
+            text-decoration: none;
+        }
+
+    .btn-success {
+        background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
+        border-color: #15803d;
+        color: white;
+        box-shadow: 0 2px 8px rgba(34, 197, 94, 0.2);
+    }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #15803d 0%, #14532d 100%);
+            border-color: #14532d;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+            color: white;
+            text-decoration: none;
+        }
+
+    /* Alert Styling */
+    .alert {
+        padding: 20px 24px;
+        border-radius: 16px;
+        margin-bottom: 24px;
+        border: 2px solid;
+        position: relative;
+        animation: fadeIn 0.6s ease-out;
+        text-align: center;
+        font-size: 16px;
+        font-weight: 500;
+    }
+
+    .alert-info {
+        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+        color: #1e40af;
+        border-color: #3b82f6;
+    }
+
+    .alert::before {
+        content: '💡';
+        font-size: 24px;
+        margin-right: 12px;
+    }
+
+    @@keyframes fadeIn {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+
+    /* Card Styling */
+    .card {
+        background: linear-gradient(145deg, #ffffff 0%, #fefffe 100%);
+        border: 1px solid rgba(34, 197, 94, 0.08);
+        border-radius: 20px;
+        box-shadow: 0 20px 50px rgba(34, 197, 94, 0.06), 0 10px 30px rgba(0, 0, 0, 0.03);
+        position: relative;
+        overflow: hidden;
+        transition: all 0.4s ease;
+        animation: slideUp 0.8s ease-out 0.2s both;
+    }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #22c55e 0%, #16a34a 50%, #15803d 100%);
+        }
+
+    @@keyframes slideUp {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+
+    .p-3 {
+        padding: 32px;
+    }
+
+    /* Table Styling */
+    .table-responsive {
+        overflow-x: auto;
+        border-radius: 16px;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 0;
+        background: white;
+    }
+
+        .table thead {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        }
+
+        .table th {
+            padding: 20px 24px;
+            font-weight: 600;
+            color: #15803d;
+            text-align: left;
+            border-bottom: 2px solid rgba(34, 197, 94, 0.1);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .table td {
+            padding: 20px 24px;
+            border-bottom: 1px solid rgba(34, 197, 94, 0.05);
+            vertical-align: middle;
+            color: #374151;
+            font-weight: 500;
+        }
+
+        .table tbody tr {
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+            .table tbody tr:hover {
+                background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(34, 197, 94, 0.08);
+            }
+
+    .align-middle {
+        vertical-align: middle;
+    }
+
+    /* Badge Styling */
+    .badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .bg-success {
+        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        color: white;
+        box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+    }
+
+    .bg-secondary {
+        background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+        color: white;
+        box-shadow: 0 2px 8px rgba(107, 114, 128, 0.3);
+    }
+
+    .badge::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        animation: shimmer 3s infinite;
+    }
+
+    @@keyframes shimmer {
+        0%
+
+    {
+        left: -100%;
+    }
+
+    100% {
+        left: 100%;
+    }
+
+    }
+
+    /* Join Code Styling */
+    code {
+        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        color: #15803d;
+        padding: 6px 10px;
+        border-radius: 6px;
+        font-family: 'Courier New', monospace;
+        font-weight: 600;
+        border: 1px solid rgba(34, 197, 94, 0.2);
+        font-size: 14px;
+        letter-spacing: 1px;
+    }
+
+    .text-muted {
+        color: #9ca3af;
+        font-style: italic;
+    }
+
+    /* Progress Bar Styling */
+    .progress {
+        background: #f3f4f6;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        min-width: 120px;
+    }
+
+    .progress-bar {
+        height: 100%;
+        transition: width 0.8s ease;
+        border-radius: 10px;
+        position: relative;
+        overflow: hidden;
+        font-size: 12px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+
+        .progress-bar.bg-info {
+            background: linear-gradient(90deg, #06b6d4 0%, #0891b2 100%);
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            animation: progressShimmer 2s infinite;
+        }
+
+    @@keyframes progressShimmer {
+        0%
+
+    {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
+
+    }
+
+    /* Form Styling */
+    form[style*="display:inline"] {
+        display: inline-block !important;
+    }
+
+    /* Responsive Design */
+    @@media (max-width: 1200px) {
+        .container
+
+    {
+        max-width: 100%;
+    }
+
+    }
+
+    @@media (max-width: 768px) {
+        body
+
+    {
+        padding: 20px 15px;
+    }
+
+    .p-3 {
+        padding: 20px;
+    }
+
+    h3 {
+        font-size: 24px;
+        padding-left: 40px;
+    }
+
+        h3::before {
+            font-size: 24px;
+        }
+
+    .d-flex {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 16px;
+    }
+
+    .ms-auto {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .btn {
+        width: 100%;
+        margin-bottom: 8px;
+    }
+
+    .btn-sm {
+        width: auto;
+        display: inline-block;
+        margin-right: 8px;
+        margin-bottom: 8px;
+    }
+
+    .table {
+        font-size: 14px;
+    }
+
+        .table th,
+        .table td {
+            padding: 12px 8px;
+        }
+
+    .gap-2 {
+        gap: 8px;
+    }
+
+    }
+
+    @@media (max-width: 576px) {
+        h3
+
+    {
+        font-size: 20px;
+        padding-left: 0;
+        text-align: center;
+    }
+
+    h3::before {
+        position: static;
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    h3::after {
+        left: 50%;
+        transform: translateX(-50%);
+        width: 120px;
+    }
+
+    .table {
+        min-width: 700px;
+    }
+
+    .progress {
+        min-width: 100px;
+    }
+
+    }
+
+    /* Animation for table rows */
+    .table tbody tr {
+        animation: fadeInUp 0.6s ease-out both;
+    }
+
+        .table tbody tr:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .table tbody tr:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .table tbody tr:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .table tbody tr:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        .table tbody tr:nth-child(5) {
+            animation-delay: 0.5s;
+        }
+
+    @@keyframes fadeInUp {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+</style>
+
+
+<script>
+    // Handle form submissions with confirmation
+    document.querySelectorAll('form[method="post"]').forEach(form => {
+        form.addEventListener('submit', function(e) {
+
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const action = submitBtn.textContent.trim();
+            const workspaceRow = this.closest('tr');
+            const workspaceName = workspaceRow.querySelector('td:nth-child(2)').textContent;
+            const originalText = submitBtn.textContent;
+
+            // Show confirmation dialog
+            const confirmMessage = action === 'Inactivate'
+                ? `Are you sure you want to inactivate "${workspaceName}"?`
+                : `Are you sure you want to restore "${workspaceName}"?`;
+
+            if (confirm(confirmMessage)) {
+                // Show loading state
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = action === 'Inactivate' ? '⏳ Inactivating...' : '⏳ Restoring...';
+
+                // Simulate form processing
+                setTimeout(() => {
+                    const statusBadge = workspaceRow.querySelector('.badge');
+
+                    if (action === 'Inactivate') {
+                        statusBadge.className = 'badge bg-secondary';
+                        statusBadge.textContent = 'Inactive';
+                        submitBtn.className = 'btn btn-sm btn-success';
+                        submitBtn.innerHTML = 'Restore';
+                    } else {
+                        statusBadge.className = 'badge bg-success';
+                        statusBadge.textContent = 'Active';
+                        submitBtn.className = 'btn btn-sm btn-secondary';
+                        submitBtn.innerHTML = 'Inactivate';
+                    }
+
+                    submitBtn.disabled = false;
+
+                    // Show success animation
+                    workspaceRow.style.background = 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)';
+                    setTimeout(() => {
+                        workspaceRow.style.background = '';
+                    }, 2000);
+
+                }, 1500);
+            }
+        });
+    });
+
+    // Add ripple effect to buttons
+    document.querySelectorAll('.btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            const ripple = document.createElement('span');
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size / 2;
+            const y = e.clientY - rect.top - size / 2;
+
+            ripple.style.cssText = `
+                position: absolute;
+                width: ${size}px;
+                height: ${size}px;
+                left: ${x}px;
+                top: ${y}px;
+                background: rgba(255, 255, 255, 0.3);
+                border-radius: 50%;
+                transform: scale(0);
+                animation: ripple 0.6s ease-out;
+                pointer-events: none;
+            `;
+
+            this.appendChild(ripple);
+
+            setTimeout(() => ripple.remove(), 600);
+        });
+    });
+
+    // Animate progress bars on load
+    document.querySelectorAll('.progress-bar').forEach((bar, index) => {
+        const width = bar.style.width;
+        bar.style.width = '0%';
+
+        setTimeout(() => {
+            bar.style.width = width;
+        }, 500 + (index * 200));
+    });
+
+    // Add CSS for ripple animation
+    const style = document.createElement('style');
+    style.textContent = `
+        @@keyframes ripple {
+            to {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+</script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97947b5bf6496f7a',t:'MTc1Njg5NDQ4NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
