@@ -258,10 +258,20 @@ namespace TaskAssignmentSystem.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)
         {
+            var team = _teams.GetById(id);  // get team first
+            if (team == null)
+            {
+                TempData["Error"] = "Team not found.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            var workspaceId = team.WorkspaceId;
             var ok = _teams.Delete(id);
             TempData[ok ? "Success" : "Error"] = ok ? "Team deleted." : "Error deleting team.";
-            return RedirectToAction("ForWorkspace", new { id = ok ? id : 0 });
+
+            return RedirectToAction("ForWorkspace", new { id = workspaceId });
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]

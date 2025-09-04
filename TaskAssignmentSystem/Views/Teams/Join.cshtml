@@ -3,7 +3,17 @@
 }
 <div class="container mt-4" style="max-width:520px;">
     <div class="card">
-    <h3>Join Team</h3>
+        <h3 style="position: relative; padding-left: 50px; text-align: center; color:#15803d;">
+            <i class="bi bi-link-45deg" style="
+        position: absolute;
+        left: 20%;
+        top: 0;
+        transform: translateX(-50%);
+        font-size: 32px;
+        color: #16a34a;
+        animation: bounce 2s infinite;"></i>
+            Join Team
+        </h3>
     <hr />
 
 
@@ -21,7 +31,14 @@
     }
     <form method="post" asp-action="Join">
         <div class="mb-3">
-            <label class="form-label">Team Join Code</label>
+                <label class="form-label" style="position: relative; padding-left: 35px;">
+                    <i class="bi bi-key-fill" style="
+            position: absolute;
+            left: 0;
+            top: 0;
+            font-size: 18px;
+            color: #16a34a;"></i>Team Join Code
+                </label>
             <input name="code" class="form-control" required placeholder="Enter team join code..." />
         </div>
 
@@ -76,7 +93,6 @@
         }
 
         .card::before {
-            content: '';
             position: absolute;
             top: 0;
             left: 0;
@@ -110,7 +126,6 @@
         }
 
         h3::before {
-            content: '??';
             position: absolute;
             left: 22%;
             top: -2px;
@@ -120,7 +135,6 @@
         }
 
         h3::after {
-            content: '';
             position: absolute;
             bottom: -8px;
             left: 50%;
@@ -186,7 +200,6 @@
         }
 
         .form-label::before {
-            content: '??';
             position: absolute;
             left: 0;
             top: 0;
@@ -275,7 +288,6 @@
         }
 
         .btn::before {
-            content: '';
             position: absolute;
             top: 0;
             left: -100%;
@@ -586,8 +598,9 @@
             joinForm.classList.add('success-state');
             joinCodeInput.classList.add('success-state');
 
-            joinButton.innerHTML = '? Joined Successfully!';
-            joinButton.style.background = 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)';
+    joinButton.innerHTML = '<i class="bi bi-check-circle-fill" style="margin-right:6px; vertical-align:middle;"></i> Joined Successfully!';
+    joinButton.style.background = 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)';
+
 
             // Simulate redirect
             setTimeout(() => {
@@ -601,17 +614,6 @@
         }, 2500);
     });
 
-    // Get team name from code
-    function getTeamName(code) {
-        const teamNames = {
-            'DEV-2024-001': 'Development Team Alpha',
-            'DES-2024-002': 'Design Team Beta',
-            'RES-2024-003': 'Research Team Gamma',
-            'TEST-2024-004': 'Testing Team Delta',
-            'MKT-2024-005': 'Marketing Team Epsilon'
-        };
-        return teamNames[code] || 'Unknown Team';
-    }
 
     // Show error alert
     function showError(message) {

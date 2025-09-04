@@ -5,7 +5,10 @@
 <div class="custom-row justify-content-center">
     <div class="custom-col">
         <div class="card p-4 mt-3">
-            <h3 class="mb-3">Create a new workspace</h3>
+            <h3 class="mb-3">
+                <i class="bi bi-layers-fill" style="font-size:28px; color:#16a34a; vertical-align:middle; margin-right:8px;"></i>
+                Create a new workspace
+            </h3>
             <form asp-action="Create" asp-controller="Workspaces" method="post">
                 <div class="mb-3">
                     <label class="form-label">Workspace Name</label>
@@ -138,7 +141,6 @@
     }
 
         h3::before {
-            content: '🌱';
             position: absolute;
             left: 0;
             top: -2px;
@@ -448,16 +450,16 @@
         const originalText = submitBtn.textContent;
 
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '🌱 Creating...';
+        submitBtn.innerHTML = '<i class="bi bi-seedling"></i> Creating...';
 
         setTimeout(() => {
-            submitBtn.innerHTML = '✅ Created!';
+            submitBtn.innerHTML = '<i class="bi bi-check-circle-fill"></i> Created!';
             const card = document.querySelector('.card');
             const successMsg = document.createElement('div');
             successMsg.innerHTML = `<div style="
                 background:#dcfce7; color:#15803d; padding:16px; border-radius:12px;
                 margin-top:20px; text-align:center; font-weight:600; border:2px solid #22c55e;
-            ">🎉 Workspace created successfully!</div>`;
+            "><i class="bi bi-emoji-smile-fill"></i> Workspace created successfully!</div>`;
             card.appendChild(successMsg);
 
             setTimeout(() => {

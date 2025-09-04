@@ -6,18 +6,23 @@
 
 <div class="container">
 <div class="card">
-    <h2>Create New Team</h2>
+        <h2><i class="bi bi-check-circle-fill fs-2" style="color:#16a34a; margin-right:8px;"></i>Create New Team</h2>
+
 <form method="post" asp-action="Create">
 
  
     <input type="hidden" name="workspaceId" value="@workspaceId" />
     <div class="mb-3">
-        <label class="form-label">Team Name</label>
+                <label class="form-label">
+                    <i class="bi bi-person-workspace fs-3" style="color:#16a34a; margin-right:6px;"></i>Team Name
+                </label>
         <input name="name" class="form-control" required placeholder="Enter team name..." />
     </div>
 
     <div class="mb-3">
-        <label class="form-label">Leader Type</label>
+                <label class="form-label">
+                    <i class="bi bi-people-fill fs-3" style="color:#16a34a; margin-right:6px;"></i>Leader Type
+                </label>
         <select name="leaderType" class="form-select" id="leaderType">
             <option value="Teacher">Teacher</option>
             <option value="Student">Student</option>
@@ -25,7 +30,9 @@
     </div>
 
     <div class="mb-3" id="teacherDropdown" >
-        <label class="form-label">Select Teacher</label>
+                <label class="form-label">
+                    <i class="bi bi-person-fill-gear fs-3" style="color:#16a34a; margin-right:6px;"></i>Select Teacher
+                </label>
         <select name="teacherUserId" class="form-select">
             @foreach (var t in teachers)
             {
@@ -35,7 +42,9 @@
     </div>
 
     <div class="mb-3" id="studentDropdown" style="display:none;">
-        <label class="form-label">Select Student</label>
+                <label class="form-label">
+                    <i class="bi bi-person-badge-fill fs-3" style="color:#16a34a; margin-right:6px;"></i>Select Student
+                </label>
         <select name="studentUserId" class="form-select">
             @foreach (var s in students)
             {
@@ -48,7 +57,7 @@
 </form>
 
 <div class="success-message" id="successMessage">
-    ?? Team created successfully!
+            <i class="bi bi-check-circle-fill" style="color:#16a34a; margin-right:6px;"></i> Team created successfully!
 </div>
     </div>
 </div>
@@ -146,7 +155,6 @@
     }
 
         h2::before {
-            content: '??';
             position: absolute;
             left: 50%;
             top: -40px;
@@ -156,7 +164,6 @@
         }
 
         h2::after {
-            content: '';
             position: absolute;
             bottom: -8px;
             left: 50%;
@@ -242,21 +249,6 @@
             font-size: 18px;
         }
 
-        .form-label:nth-of-type(1)::before {
-            content: '???';
-        }
-
-        .form-label:nth-of-type(2)::before {
-            content: '??';
-        }
-
-        .form-label:nth-of-type(3)::before {
-            content: '?????';
-        }
-
-        .form-label:nth-of-type(4)::before {
-            content: '?????';
-        }
 
     /* Input Styling */
     .form-control, .form-select {
@@ -294,7 +286,6 @@
     /* Select Styling */
     .form-select {
         cursor: pointer;
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2322c55e' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
         background-repeat: no-repeat;
         background-position: right 16px center;
         background-size: 16px;
@@ -388,7 +379,6 @@
     /* Validation Styling */
     .form-control:valid:not(:placeholder-shown) {
         border-color: #22c55e;
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2322c55e' d='m2.3 6.73.94-.94 2.94 2.94L7.83 7.09 8.77 8.03 5.24 11.56z'/%3e%3c/svg%3e");
         background-repeat: no-repeat;
         background-position: right 20px center;
         background-size: 20px;
@@ -397,7 +387,6 @@
 
     .form-control:invalid:not(:placeholder-shown) {
         border-color: #ef4444;
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23ef4444'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath d='m5.8 4.6 2.4 2.4M8.2 4.6l-2.4 2.4'/%3e%3c/svg%3e");
         background-repeat: no-repeat;
         background-position: right 20px center;
         background-size: 20px;
@@ -644,7 +633,7 @@
 
         // Show loading state
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '? Creating Team...';
+        submitBtn.innerHTML = '<i class="bi bi-hourglass-split fs-4" style="margin-right:6px; color:#16a34a;"></i> Creating Team...';
 
         // Simulate form processing
         setTimeout(() => {
@@ -656,11 +645,11 @@
             const leaderName = leaderSelect.options[leaderSelect.selectedIndex].text.split(' (')[0];
 
             // Show success state
-            submitBtn.innerHTML = '? Team Created!';
+            submitBtn.innerHTML = '<i class="bi bi-check-circle-fill fs-3" style="margin-right:6px; color:#16a34a;"></i> Team Created!';
             submitBtn.style.background = 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)';
             submitBtn.style.borderColor = '#16a34a';
 
-            successMsg.innerHTML = `?? Team "${teamName}" created successfully with ${leaderName} as ${leaderType} leader!`;
+            successMsg.innerHTML = `<i class="bi bi-check-circle-fill fs-3" style="margin-right:8px; color:#16a34a;"></i> Team "${teamName}" created successfully with ${leaderName} as ${leaderType} leader!`;
             successMsg.style.display = 'block';
 
             // Add celebration effect

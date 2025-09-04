@@ -4,7 +4,10 @@
     ViewData["ActiveNav"] = "AdminUsers";
     dynamic m = Model;
 }
-<h3 class="mb-3">Manage Users</h3>
+<h3 class="mb-3">
+    <i class="bi bi-people-fill icon-green fs-3"></i> Manage Users
+</h3>
+
 
 <ul class="nav nav-tabs" id="userTabs" role="tablist">
     <li class="nav-item" role="presentation">
@@ -115,7 +118,10 @@
                                         <option value="@Role.Admin" selected="@(u.Role == Role.Admin)">Admin</option>
                                         <option value="@Role.Teacher" selected="@(u.Role == Role.Teacher)">Teacher</option>                                    
                                     </select>
-                                    <button class="btn btn-sm btn-outline-primary"> <i class="bi bi-pencil"></i> Update</button>
+                                    <button class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-pencil-fill icon-green fs-5"></i> Update
+                                    </button>
+
                                 </form>
                             </td>
                         </tr>
@@ -162,7 +168,6 @@
     }
 
         h3::before {
-            content: '??';
             position: absolute;
             left: 0;
             top: -2px;
@@ -565,6 +570,13 @@
             box-shadow: 0 5px 16px rgba(239, 68, 68, 0.4);
         }
 
+    .icon-green {
+        color: #343a40; 
+        vertical-align: middle;
+        margin-right: 6px;
+    }
+
+
     .btn-outline-primary {
         background: transparent;
         color: #2563eb;
@@ -586,17 +598,7 @@
         font-size: 12px;
     }
 
-    .bi-check-circle::before {
-        content: '?';
-    }
 
-    .bi-x-circle::before {
-        content: '?';
-    }
-
-    .bi-pencil::before {
-        content: '??';
-    }
 
     /* Form and Select Styling */
     .d-flex {

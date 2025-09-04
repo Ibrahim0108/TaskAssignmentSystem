@@ -13,6 +13,9 @@ namespace TaskAssignmentSystem.Models.Task
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public bool IsActive { get; set; } = true;
 
+        public int Status { get; set; } = 0;
+
+
         // navigation
         public Workspace Workspace { get; set; } = null!;
         public List<TaskProgress> ProgressUpdates { get; set; } = new();

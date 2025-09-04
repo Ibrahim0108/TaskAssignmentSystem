@@ -101,13 +101,20 @@ else
 
                                     @if (w.IsActive)
                                     {
-                                        <form method="post" asp-action="MarkInactive" asp-route-id="@w.Id" style="display:inline;">
+                                        <form method="post" asp-action="MarkInactive" asp-route-id="@w.Id" style="display:inline;" data-confirm
+                                              data-confirm-title="Inactivate Workspace"
+                                              data-confirm-message='Are you sure you want to inactivate "@w.Name"?'>
                                             <button type="submit" class="btn btn-sm btn-secondary">Inactivate</button>
                                         </form>
+
+
+
                                     }
                                     else
                                     {
-                                        <form method="post" asp-action="Restore" asp-route-id="@w.Id" style="display:inline;">
+                                        <form method="post" asp-action="Restore" asp-route-id="@w.Id" style="display:inline;" data-confirm
+                                              data-confirm-title="Restore Workspace"
+                                              data-confirm-message='Are you sure you want to restore "@w.Name"?'>
                                             <button type="submit" class="btn btn-sm btn-success">Restore</button>
                                         </form>
                                     }
@@ -758,24 +765,35 @@ else
 
 <script>
     // Handle form submissions with confirmation
-    document.querySelectorAll('form[method="post"]').forEach(form => {
-        form.addEventListener('submit', function(e) {
+        document.addEventListener("DOMContentLoaded", () => {
+        const modalEl = document.getElementById("confirmModal");
+        const confirmModal = new bootstrap.Modal(modalEl);
+        let formToSubmit = null;
 
-            const submitBtn = this.querySelector('button[type="submit"]');
-            const action = submitBtn.textContent.trim();
-            const workspaceRow = this.closest('tr');
-            const workspaceName = workspaceRow.querySelector('td:nth-child(2)').textContent;
-            const originalText = submitBtn.textContent;
+        document.querySelectorAll("form[data-confirm]").forEach(form => {
+            form.addEventListener("submit", function (e) {
+                e.preventDefault(); // stop immediate submission
+                formToSubmit = this;
 
-            // Show confirmation dialog
-            const confirmMessage = action === 'Inactivate'
-                ? `Are you sure you want to inactivate "${workspaceName}"?`
-                : `Are you sure you want to restore "${workspaceName}"?`;
+                const title = this.getAttribute("data-confirm-title") || "Confirm Action";
+                const body = this.getAttribute("data-confirm-message") || "Are you sure you want to continue?";
 
-            if (confirm(confirmMessage)) {
-                // Show loading state
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = action === 'Inactivate' ? '⏳ Inactivating...' : '⏳ Restoring...';
+                document.getElementById("confirmModalTitle").innerText = title;
+                document.getElementById("confirmModalBody").innerText = body;
+
+                confirmModal.show();
+            });
+        });
+
+        document.getElementById("confirmModalOk").addEventListener("click", () => {
+            if (formToSubmit) {
+                formToSubmit.submit();
+                formToSubmit = null;
+                confirmModal.hide();
+            }
+        });
+    });
+
 
                 // Simulate form processing
                 setTimeout(() => {

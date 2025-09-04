@@ -68,5 +68,17 @@ namespace TaskAssignmentSystem.Services.Implementations
                       .Where(t => t.WorkspaceId == workspaceId)
                       .ToList();
         }
+
+        public void UpdateStatus(int taskId, int status)
+        {
+            var task = _db.WorkspaceTasks.FirstOrDefault(t => t.Id == taskId);
+            if (task != null)
+            {
+                task.Status = status;
+                _db.WorkspaceTasks.Update(task);
+                _db.SaveChanges();
+            }
+        }
+
     }
 }

@@ -126,7 +126,7 @@
         /* Card Icons */
         .card-icon {
             position: absolute;
-            top: 20px;
+            top: 40px;
             right: 20px;
             width: 48px;
             height: 48px;
@@ -147,7 +147,7 @@
         /* Specific card styling */
         .card:nth-child(1) .card-icon {
             background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-            color: #1e40af;
+            color: #6b7280;
         }
 
         .card:nth-child(2) .card-icon {
@@ -443,7 +443,7 @@
 
                     <a class="action-button action-button-primary" href="@Url.Action("Workspaces", "Admin")">
                         <div class="action-button-title">
-                            <span class="action-button-icon">??</span>
+                            <span class="action-button-icon"><i class="bi bi-kanban"></i></span>
                             <span>Manage Workspaces</span>
                         </div>
                         <p class="action-button-description">
@@ -453,7 +453,7 @@
 
                     <a class="action-button action-button-secondary" href="@Url.Action("Users", "Admin")">
                         <div class="action-button-title">
-                            <span class="action-button-icon">??</span>
+                            <span class="action-button-icon"><i class="bi bi-people-fill"></i></span>
                             <span>Manage Users</span>
                         </div>
                         <p class="action-button-description">
@@ -468,28 +468,28 @@
                 <div class="row g-3">
                     <div class="col-md-3">
                         <div class="card p-3">
-                            <div class="card-icon">??</div>
+                            <div class="card-icon"><i class="bi bi-person-badge"></i></div>
                             <div class="text-muted small">Total Users</div>
                             <div class="display-6">@m.TotalUsers</div>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="card p-3">
-                            <div class="card-icon">?????</div>
+                            <div class="card-icon"><i class="bi bi-person-video3"></i></div>
                             <div class="text-muted small">Teachers</div>
                             <div class="display-6">@m.TotalTeachers</div>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="card p-3">
-                            <div class="card-icon">??</div>
+                            <div class="card-icon"><i class="bi bi-mortarboard-fill"></i></div>
                             <div class="text-muted small">Students</div>
                             <div class="display-6">@m.TotalStudents</div>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="card p-3">
-                            <div class="card-icon">?</div>
+                            <div class="card-icon"><i class="bi bi-hourglass-split"></i></div>
                             <div class="text-muted small">Pending Approvals</div>
                             <div class="display-6">@m.PendingUsers</div>
                         </div>
@@ -497,14 +497,14 @@
 
                     <div class="col-md-6">
                         <div class="card p-3">
-                            <div class="card-icon">?</div>
+                            <div class="card-icon"><i class="bi bi-check-circle-fill"></i></div>
                             <div class="text-muted small">Active Workspaces</div>
                             <div class="display-6">@m.ActiveWorkspaces</div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="card p-3">
-                            <div class="card-icon">??</div>
+                            <div class="card-icon"><i class="bi bi-slash-circle-fill"></i></div>
                             <div class="text-muted small">Inactive Workspaces</div>
                             <div class="display-6">@m.InactiveWorkspaces</div>
                         </div>

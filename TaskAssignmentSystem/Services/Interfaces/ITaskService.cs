@@ -9,5 +9,7 @@ namespace TaskAssignmentSystem.Services.Interfaces
         WorkspaceTask? GetTaskById(int id);
         IEnumerable<WorkspaceTask> GetTasksByWorkspace(int workspaceId);
 
+        void UpdateStatus(int taskId, int status);
+
     }
 }

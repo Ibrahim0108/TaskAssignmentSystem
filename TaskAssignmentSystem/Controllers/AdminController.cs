@@ -130,6 +130,17 @@ namespace TaskAssignmentSystem.Controllers
             return RedirectToAction("Pending");
         }
 
+        [HttpPost]
+        public IActionResult Restore([FromForm] int id)
+        {
+            var workspace = _context.Workspaces.Find(id);
+            if (workspace != null)
+            {
+                workspace.IsActive = true;
+                _context.SaveChanges();
+            }
+            return RedirectToAction("Workspaces");
+        }
 
 
         // ✅ Change role of user

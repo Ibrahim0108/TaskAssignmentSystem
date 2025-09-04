@@ -226,5 +226,35 @@ namespace TaskAssignmentSystem.Controllers
         }
 
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult UpdateStatus(int taskId, int status)
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null) return Unauthorized();
+
+            // Map status ? progress % (keep if you want to tie them together)
+            int progress = status switch
+            {
+                0 => 0,    // Not Started
+                1 => 50,   // In Progress
+                2 => 100,  // Completed
+                3 => 25,   // Blocked (optional)
+                _ => 0
+            };
+
+            _taskService.UpdateProgress(taskId, userId.Value, progress);
+
+            // ? Now actually update the task’s status
+            _taskService.UpdateStatus(taskId, status);
+
+            TempData["Success"] = "Status updated successfully.";
+
+            var task = _taskService.GetTaskById(taskId);
+            return RedirectToAction("Details", "Workspaces", new { id = task?.WorkspaceId });
+        }
+
+
+
     }
 }

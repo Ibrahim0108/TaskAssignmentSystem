@@ -9,14 +9,18 @@
 }
 
 <!-- Full-screen Parent Container -->
-<div class="workspace-page">
+<div class="workspace-page @(role == "Teacher" ? "teacher-layout" : "student-layout")">
+
 
     <!-- Left Form Card - Visible on desktop -->
     @if (role == "Teacher")
     {
         <div class="left-card desktop-only">
             <h2 class="card-title"><i class="fas fa-tasks"></i> Assign New Task</h2>
-            <form method="post" asp-action="AssignTask" class="task-form">
+            <form method="post" asp-action="AssignTask" class="task-form"
+                  data-confirm="true"
+                  data-confirm-title="Assign Task"
+                  data-confirm-message="Are you sure you want to assign this task?">   
                 <input type="hidden" name="workspaceId" value="@Model.Id" />
                 <div class="form-group">
                     <label for="taskTitle">Task Title</label>
@@ -26,7 +30,7 @@
                     <label for="taskDescription">Description</label>
                     <textarea id="taskDescription" name="description" class="form-control" placeholder="Describe the task details"></textarea>
                 </div>
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-primary" >
                     <i class="fas fa-plus-circle"></i> Assign Task
                 </button>
             </form>
@@ -61,6 +65,7 @@
                             <th>Title</th>
                             <th>Description</th>
                             <th>Progress</th>
+                            <th>Status</th>
                             @if (role == "Student")
                             {
                                 <th>Action</th>
@@ -82,12 +87,18 @@
                                 @if (role == "Student")
                                 {
                                     <td>
-                                        <form method="post" asp-action="UpdateProgress" asp-controller="Workspaces" class="action-form">
+                                        <form method="post" asp-action="UpdateStatus" class="d-inline">
                                             <input type="hidden" name="taskId" value="@task.Id" />
-                                            <input type="number" name="progress" min="0" max="100" value="@progress" class="form-control-sm">
-                                            <button type="submit" class="btn btn-primary btn-sm">Update</button>
+                                            <select name="status" class="form-select" required>
+                                                <option value="0" class="status-not-started">Not Started</option>
+                                                <option value="1" class="status-in-progress">In Progress</option>
+                                                <option value="2" class="status-completed">Completed</option>
+                                                <option value="3" class="status-blocked">Blocked</option>
+                                            </select>  
                                         </form>
+
                                     </td>
+                                     <td><button type="submit" class="btn btn-sm btn-primary">Save</button></td>
                                 }
                             </tr>
                         }
@@ -132,7 +143,7 @@
 }
 
 <style>
-    /* Your original desktop styles */
+    /* Main layout */
     .workspace-page {
         display: grid;
         grid-template-columns: 35% 65%;
@@ -145,8 +156,16 @@
         box-sizing: border-box;
     }
 
-    .left-card {
-        height: 500px;
+        .workspace-page.teacher-layout {
+            grid-template-columns: 35% 65%;
+        }
+
+        .workspace-page.student-layout {
+            display: block;
+            width: 100%;
+        }
+
+    .left-card, .right-card {
         background: #fff;
         border-radius: 20px;
         padding: 20px;
@@ -155,14 +174,12 @@
         flex-direction: column;
     }
 
+    .left-card {
+        height: 500px;
+    }
+
     .right-card {
         height: 500px;
-        background: #fff;
-        border-radius: 20px;
-        padding: 20px;
-        box-shadow: 0 10px 30px rgba(34,197,94,0.1), 0 4px 15px rgba(0,0,0,0.05);
-        display: flex;
-        flex-direction: column;
     }
 
     .card-title {
@@ -232,28 +249,54 @@
             color: #374151;
         }
 
-    .form-control, textarea.form-control {
+    .form-control, .form-select, textarea.form-control {
         width: 100%;
         padding: 12px 16px;
         border: 2px solid rgba(34,197,94,0.15);
-        border-radius: 10px;
+        border-radius: 12px;
         font-size: 14px;
+        color: #374151;
+        background: linear-gradient(145deg, #ffffff 0%, #f9fafb 100%);
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(34,197,94,0.05);
     }
+
+        .form-control:focus, .form-select:focus {
+            outline: none;
+            border-color: #22c55e;
+            box-shadow: 0 0 0 4px rgba(34,197,94,0.08), 0 4px 12px rgba(34,197,94,0.15);
+            background: linear-gradient(145deg, #f0fdf4 0%, #dcfce7 100%);
+        }
 
     textarea.form-control {
         min-height: 120px;
         resize: vertical;
     }
 
+    .status-not-started {
+        color: #6b7280;
+    }
+
+    .status-in-progress {
+        color: #f59e0b;
+    }
+
+    .status-completed {
+        color: #22c55e;
+    }
+
+    .status-blocked {
+        color: #ef4444;
+    }
+
     .btn-primary {
         background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
-        border-color: #15803d;
+        border: none;
+        border-radius: 8px;
         color: white;
         padding: 12px 20px;
-        border-radius: 8px;
         font-weight: 600;
         cursor: pointer;
-        border: none;
         display: inline-flex;
         align-items: center;
         gap: 8px;
@@ -263,20 +306,19 @@
             background: linear-gradient(135deg, #15803d 0%, #14532d 100%);
         }
 
-    /* Mobile-specific styles */
-    .mobile-only {
-        display: none;
-    }
-
-    .desktop-only {
-        display: block;
-    }
-
     .card-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
         margin-bottom: 15px;
+    }
+
+    .mobile-only {
+        display: none !important;
+    }
+
+    .desktop-only {
+        display: block;
     }
 
     .mobile-task-button {
@@ -300,7 +342,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
+        background-color: rgba(0,0,0,0.5);
         z-index: 1000;
         align-items: center;
         justify-content: center;
@@ -313,7 +355,7 @@
         max-width: 500px;
         max-height: 80vh;
         overflow-y: auto;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     }
 
     .modal-header {
@@ -358,7 +400,7 @@
         cursor: pointer;
     }
 
-    /* Responsive styles */
+    /* Responsive */
     @@media (max-width: 1024px) {
         .workspace-page {
             grid-template-columns: 1fr;
@@ -378,7 +420,7 @@
         }
 
         .mobile-only {
-            display: flex;
+            display: flex !important;
         }
 
         table {
@@ -438,20 +480,12 @@
             font-size: 14px;
         }
 
-        .action-form {
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .form-control-sm {
-            width: 70px;
-        }
-
         .modal-content {
             width: 95%;
         }
     }
 </style>
+
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -498,21 +532,37 @@
         });
 
         // Task form submit
-        const taskForms = document.querySelectorAll('.task-form');
-        taskForms.forEach(form => {
-            form.addEventListener('submit', function(e) {
-                const titleInput = this.querySelector('input[type="text"]');
-                if (titleInput.value.trim() === '') {
-                    alert('Please enter a task title');
-                    titleInput.focus();
-                    e.preventDefault();
-                    return;
+    // Intercept all task forms with data-confirm
+    document.querySelectorAll('form.task-form[data-confirm="true"]').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault(); // stop immediate submission
+
+            const titleInput = form.querySelector('input[name="title"]');
+            if (titleInput.value.trim() === '') {
+                alert('Please enter a task title');
+                titleInput.focus();
+                return;
+            }
+
+            const title = form.getAttribute('data-confirm-title');
+            const message = form.getAttribute('data-confirm-message');
+
+            // Trigger your existing custom modal
+            showCustomConfirmModal(title, message).then(confirmed => {
+                if (confirmed) {
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Assigning...';
+
+                    // Submit the form
+                    setTimeout(() => {
+                        form.submit();
+                    }, 300); // optional small delay for UI effect
                 }
-                const submitBtn = this.querySelector('button[type="submit"]');
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Assigning...';
-                submitBtn.disabled = true;
             });
         });
+    });
+
 
         // Progress update buttons
         const updateButtons = document.querySelectorAll('.action-form button');

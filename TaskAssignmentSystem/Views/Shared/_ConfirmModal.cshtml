@@ -24,6 +24,7 @@
 
         document.querySelectorAll("form[data-confirm]").forEach(form => {
             form.addEventListener("submit", function (e) {
+                   e.preventDefault();
                 formToSubmit = this;
 
                 // customize text if attributes exist
