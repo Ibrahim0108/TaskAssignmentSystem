@@ -83,5 +83,52 @@ namespace TaskAssignmentSystem.Controllers
             var users = _auth.GetAll();
             return View(users);
         }
+
+
+
+        [HttpGet]
+        public IActionResult ProfilePage()
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null) return RedirectToAction("Login");
+
+            var user = _auth.GetById(userId.Value);
+            return View(user); // Pass user to the page
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult UpdateProfile(User updatedUser)
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null) return RedirectToAction("Login");
+
+            var user = _auth.GetById(userId.Value);
+            if (user == null) return NotFound();
+
+            user.FullName = updatedUser.FullName;
+            user.Email = updatedUser.Email;
+            user.Department = updatedUser.Department;
+            user.Year = updatedUser.Year;
+            user.Section = updatedUser.Section;
+            // Role stays immutable
+
+            _auth.Update(user);
+
+            TempData["Success"] = "Profile updated successfully!";
+            return RedirectToAction("ProfilePage");
+        }
+
+        [HttpGet]
+        public IActionResult NotificationsPage()
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null) return RedirectToAction("Login");
+
+            var notifications = _auth.GetNotifications(userId.Value);
+            return View(notifications);
+        }
+
+
     }
 }

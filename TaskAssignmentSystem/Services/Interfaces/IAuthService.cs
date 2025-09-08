@@ -13,5 +13,11 @@ namespace TaskAssignmentSystem.Services.Interfaces
         List<User> GetPending();
         bool Approve(int userId);
         bool SetRole(int userId, Role role);
+
+        bool Update(User user);
+        List<Notification> GetNotifications(int userId);
+        Notification? GetNotificationById(int id);
+        bool MarkNotificationAsRead(int id);
+
     }
 }

@@ -99,6 +99,29 @@ namespace TaskAssignmentSystem.Services.Implementations
             return upd;
         }
 
+
+        public TeamProgressUpdate UpdateExistingUpdate(int updateId, int userId, string content, SubtaskStatus status)
+        {
+            var upd = _db.TeamProgressUpdates.FirstOrDefault(u => u.Id == updateId);
+            if (upd == null) throw new InvalidOperationException("Update not found");
+
+            // Only the assigned user can replace their assigned task (security)
+            if (!upd.AssignedToUserId.HasValue || upd.AssignedToUserId.Value != userId)
+                throw new InvalidOperationException("You are not allowed to update this task.");
+
+            // Replace content/status, set the UserId to the member (so it shows in Updates)
+            upd.Content = content;
+            upd.Status = status;
+            upd.UserId = userId;
+
+            // Reset leader review when a member changes the task
+            upd.ReviewedByLeader = false;
+
+            _db.SaveChanges();
+            return upd;
+        }
+
+
         public bool LeaderReviewUpdate(int teamId, int updateId, int leaderUserId)
         {
             var team = GetById(teamId);

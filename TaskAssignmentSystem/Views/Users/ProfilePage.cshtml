@@ -1,0 +1,700 @@
+﻿@model TaskAssignmentSystem.Models.Users.User
+@{
+    ViewData["Title"] = "Your Profile";
+}
+
+<div class="header-section">
+    <h2>
+        <i class="bi bi-person-badge-fill"></i> Your Profile
+    </h2>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+
+<div class="container">
+    <div class="card">
+
+        <!-- Success Alert (Demo) -->
+        <div class="alert alert-success" id="successAlert" style="display: none;">
+            Profile updated successfully!
+        </div>
+
+
+        <div class="form-container">
+    <form asp-action="UpdateProfile" method="post" id="profileForm">
+        <div class="mb-2 form-group name">
+            <i class="bi bi-person-fill"></i>
+            <input type="text" name="FullName" id="fullName" value="@Model.FullName" />
+            <label>Full Name</label>
+        </div>
+
+        <div class="mb-2 form-group email">
+            <i class="bi bi-envelope-fill"></i>
+            <input type="email" name="Email" id="email" value="@Model.Email" />
+            <label>Email</label>
+        </div>
+
+        <div class="mb-2 form-group role">
+            <i class="bi bi-badge-8k-fill"></i>
+            <input type="text" id="role" value="@Model.Role" disabled />
+            <label>Role</label>
+        </div>
+
+        <div class="mb-2 form-group department">
+            <i class="bi bi-building-fill"></i>
+            <input type="text" name="Department" id="department" value="@Model.Department" autocomplete="off" />
+            <label>Department</label>
+        </div>
+
+        <div class="mb-2 form-group year">
+            <i class="bi bi-calendar-fill"></i>
+            <select name="Year" id="year">
+                        <option value="1" selected="@(Model.Year == 1)">1</option>
+                        <option value="2" selected="@(Model.Year == 2)">2</option>
+                        <option value="3" selected="@(Model.Year == 3)">3</option>
+                        <option value="4" selected="@(Model.Year == 4)">4</option>
+            </select>
+            <label>Year</label>
+        </div>
+
+        <div class="mb-2 form-group section">
+            <i class="bi bi-book-fill"></i>
+            <input type="text" name="Section" id="section" value="@Model.Section" autocomplete="off" />
+            <label>Section</label>
+        </div>
+
+        <button type="submit" class="btn btn-success">
+            <i class="bi bi-save-fill"></i> Update Profile
+        </button>
+    </form>
+</div>
+
+   </div>
+</div>
+
+
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #f8fffe 0%, #f0fdf4 100%);
+        min-height: 100vh;
+        padding: 40px 20px;
+        line-height: 1.6;
+    }
+
+    /* Container */
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    /* Card Container */
+    .card {
+        background: linear-gradient(145deg, #ffffff 0%, #fefffe 100%);
+        border: 1px solid rgba(34, 197, 94, 0.08);
+        border-radius: 24px;
+        box-shadow: 0 25px 60px rgba(34, 197, 94, 0.06), 0 15px 40px rgba(0, 0, 0, 0.03);
+        position: relative;
+        overflow: hidden;
+        transition: all 0.4s ease;
+        animation: slideUp 0.8s ease-out;
+        padding: 40px;
+    }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #22c55e 0%, #16a34a 50%, #15803d 100%);
+        }
+
+    @@keyframes slideUp {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+
+    /* Header Section */
+    .header-section h2 {
+        color: #15803d;
+        font-size: 32px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px; /* space between icon and text */
+    }
+
+        .header-section h2 i {
+            font-size: 36px;
+            color: #22c55e; /* theme green */
+            animation: bounce 2s infinite;
+        }
+
+
+        h2::before {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 40px;
+            animation: bounce 2s infinite;
+        }
+
+    @@keyframes fadeInDown {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+
+    @@keyframes bounce {
+        0%, 20%, 50%, 80%, 100%
+
+    {
+        transform: translateX(-50%) translateY(0);
+    }
+
+    40% {
+        transform: translateX(-50%) translateY(-6px);
+    }
+
+    60% {
+        transform: translateX(-50%) translateY(-3px);
+    }
+
+    }
+
+    /* Alert Styling */
+    .alert {
+        padding: 16px 20px;
+        border-radius: 12px;
+        margin-bottom: 24px;
+        font-weight: 500;
+        position: relative;
+        animation: slideInDown 0.5s ease-out;
+    }
+
+    .alert-success {
+        background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+        border: 1px solid rgba(34, 197, 94, 0.2);
+        color: #15803d;
+        position: relative;
+        padding-left: 50px;
+    }
+
+        .alert-success::before {
+            content: '✅';
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+        }
+
+        .alert-success::after {
+            content: '✕';
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 16px;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        .alert-success:hover::after {
+            opacity: 1;
+        }
+
+    @@keyframes slideInDown {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+
+    /* Form Styling */
+    .form-container {
+        animation: fadeIn 0.8s ease-out 0.4s both;
+    }
+
+        /* Side by side form */
+        .form-container form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+    .form-group {
+        flex: 1 1 45%;
+        min-width: 250px;
+        position: relative;
+    }
+
+        .form-group i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            color: #22c55e; /* Green color from theme */
+            pointer-events: none;
+            z-index: 3;
+        }
+
+
+
+        .form-group label {
+            position: absolute;
+            top: 16px;
+            left: 50px;
+            color: #6b7280;
+            font-weight: 500;
+            font-size: 16px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+            background: linear-gradient(145deg, #ffffff 0%, #fefffe 100%);
+            padding: 0 8px;
+            z-index: 2;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 16px 20px 16px 50px;
+            border: 2px solid rgba(34, 197, 94, 0.1);
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            color: #374151;
+            background: linear-gradient(145deg, #ffffff 0%, #fefffe 100%);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+        }
+
+            .form-group input:focus,
+            .form-group select:focus {
+                outline: none;
+                border-color: #22c55e;
+                box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.1);
+                transform: translateY(-2px);
+            }
+
+                .form-group input:focus + label,
+                .form-group input:not(:placeholder-shown) + label,
+                .form-group input[value]:not([value=""]) + label,
+                .form-group select:focus + label,
+                .form-group select + label {
+                    top: -8px;
+                    left: 42px;
+                    font-size: 12px;
+                    color: #22c55e;
+                    font-weight: 600;
+                }
+
+            .form-group input:disabled {
+                background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+                color: #6b7280;
+                cursor: not-allowed;
+                border-color: rgba(107, 114, 128, 0.2);
+            }
+
+                .form-group input:disabled + label {
+                    color: #9ca3af;
+                }
+
+        /* Select specific styling */
+        .form-group select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 12px center;
+            background-repeat: no-repeat;
+            background-size: 16px;
+            padding-right: 40px;
+        }
+
+
+            .form-group select option {
+                padding: 12px;
+                background: white;
+                color: #374151;
+            }
+
+        /* Field Icons */
+        .form-group::before {
+            content: '';
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            color: #6b7280;
+            z-index: 3;
+            transition: color 0.3s ease;
+        }
+
+        .form-group:has(input:focus)::before,
+        .form-group:has(select:focus)::before {
+            color: #22c55e;
+        }
+
+    .btn-success i {
+        margin-right: 8px;
+        color: white;
+    }
+    /* Button Styling */
+    .btn {
+        padding: 16px 32px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 16px;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        border: 2px solid;
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+        white-space: nowrap;
+        background: none;
+        margin-top: 16px;
+    }
+
+        .btn::before {
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+    .btn-success {
+        background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
+        border-color: #15803d;
+        color: white;
+        box-shadow: 0 8px 25px rgba(34, 197, 94, 0.25);
+        position: relative;
+        padding-left: 50px;
+    }
+
+        .btn-success::after {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #15803d 0%, #14532d 100%);
+            border-color: #14532d;
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(34, 197, 94, 0.35);
+            color: white;
+            text-decoration: none;
+        }
+
+    /* Form Validation */
+    .form-group input:invalid {
+        border-color: #ef4444;
+    }
+
+        .form-group input:invalid:focus {
+            border-color: #ef4444;
+            box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+        }
+
+    .form-group input:valid {
+        border-color: rgba(34, 197, 94, 0.2);
+    }
+
+    /* Responsive Design */
+    @@media (max-width: 768px) {
+        body
+
+    {
+        padding: 20px 15px;
+    }
+
+    .card {
+        padding: 24px;
+    }
+
+    h2 {
+        font-size: 26px;
+        padding-top: 45px;
+    }
+
+        h2::before {
+            font-size: 32px;
+        }
+
+    .form-group {
+            flex: 1 1 100%;
+        margin-bottom: 24px;
+    }
+
+        .form-group input,
+        .form-group select {
+            padding: 14px 16px 14px 45px;
+            font-size: 15px;
+        }
+
+        .form-group label {
+            left: 45px;
+            font-size: 15px;
+        }
+
+        .form-group input:focus + label,
+        .form-group input:not(:placeholder-shown) + label,
+        .form-group input[value]:not([value=""]) + label,
+        .form-group select:focus + label,
+        .form-group select + label {
+            left: 37px;
+            font-size: 11px;
+        }
+
+    .btn-success {
+        padding: 14px 24px 14px 45px;
+        font-size: 15px;
+    }
+
+    }
+
+    @@media (max-width: 576px) {
+        .card
+
+    {
+        padding: 20px;
+    }
+
+    h2 {
+        font-size: 22px;
+        padding-top: 40px;
+    }
+
+        h2::before {
+            font-size: 28px;
+        }
+
+    .form-group input,
+    .form-group select {
+        padding: 12px 14px 12px 40px;
+        font-size: 14px;
+    }
+
+    .form-group label {
+        left: 40px;
+        font-size: 14px;
+    }
+
+    .form-group input:focus + label,
+    .form-group input:not(:placeholder-shown) + label,
+    .form-group input[value]:not([value=""]) + label,
+    .form-group select:focus + label,
+    .form-group select + label {
+        left: 32px;
+        font-size: 10px;
+    }
+
+    .btn-success {
+        padding: 12px 20px 12px 40px;
+        font-size: 14px;
+        width: 100%;
+    }
+
+    }
+
+    @@keyframes fadeIn {
+        from
+
+    {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+
+    }
+
+    /* Form animation delays */
+    .form-group:nth-child(1) {
+        animation: fadeInUp 0.6s ease-out 0.5s both;
+    }
+
+    .form-group:nth-child(2) {
+        animation: fadeInUp 0.6s ease-out 0.6s both;
+    }
+
+    .form-group:nth-child(3) {
+        animation: fadeInUp 0.6s ease-out 0.7s both;
+    }
+
+    .form-group:nth-child(4) {
+        animation: fadeInUp 0.6s ease-out 0.8s both;
+    }
+
+    .form-group:nth-child(5) {
+        animation: fadeInUp 0.6s ease-out 0.9s both;
+    }
+
+    .form-group:nth-child(6) {
+        animation: fadeInUp 0.6s ease-out 1.0s both;
+    }
+
+    @@keyframes fadeInUp {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+</style>
+
+
+
+    <script>
+        // Add ripple effect to buttons
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                if (this.disabled) return;
+                
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.cssText = `
+                    position: absolute;
+                    width: ${size}px;
+                    height: ${size}px;
+                    left: ${x}px;
+                    top: ${y}px;
+                    background: rgba(255, 255, 255, 0.3);
+                    border-radius: 50%;
+                    transform: scale(0);
+                    animation: ripple 0.6s ease-out;
+                    pointer-events: none;
+                `;
+                
+                this.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
+
+        // Add CSS for additional animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @@keyframes ripple {
+                to {
+                    transform: scale(2);
+                    opacity: 0;
+                }
+            }
+            
+            @@keyframes slideOutUp {
+                from {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+                to {
+                    opacity: 0;
+                    transform: translateY(-20px);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+   
+
+        // Auto-dismiss alerts
+        document.querySelectorAll('.alert-success').forEach(alert => {
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                alert.style.animation = 'slideOutUp 0.5s ease-out';
+                setTimeout(() => {
+                    alert.style.display = 'none';
+                }, 500);
+            }, 5000);
+
+            // Click to dismiss
+            alert.addEventListener('click', function() {
+                this.style.animation = 'slideOutUp 0.5s ease-out';
+                setTimeout(() => {
+                    this.style.display = 'none';
+                }, 500);
+            });
+        });
+
+        // Handle form submission (demo)
+        document.getElementById('profileForm').addEventListener('submit', function(e) {
+            
+            // Show success message
+            const alert = document.querySelector('.alert-success');
+            alert.style.display = 'block';
+            alert.style.animation = 'slideInDown 0.5s ease-out';
+            alert.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // In real app, you would submit the form data here
+            console.log('Form submitted with data:', new FormData(this));
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97bc7788052cc464',t:'MTc1NzMxMzc1Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>

@@ -150,7 +150,7 @@ namespace TaskAssignmentSystem.Controllers
         // POST: /Teams/AddUpdate
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult AddUpdate(int teamId, string content, SubtaskStatus status)
+        public IActionResult AddUpdate(int teamId, string content, SubtaskStatus status, int? updateId)
         {
             var userId = HttpContext.Session.GetInt32("UserId");
             if (userId == null) return RedirectToAction("Login", "Users");
@@ -161,12 +161,31 @@ namespace TaskAssignmentSystem.Controllers
                 return RedirectToAction("Details", new { id = teamId });
             }
 
-            
+            try
+            {
+                if (updateId.HasValue)
+                {
+                    // Replace existing assigned update
+                    _teams.UpdateExistingUpdate(updateId.Value, userId.Value, content.Trim(), status);
+                    TempData["Success"] = "Task updated.";
+                }
+                else
+                {
+                    // New normal update
+                    _teams.AddUpdate(teamId, userId.Value, content.Trim(), status);
+                    TempData["Success"] = "Update added.";
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+            }
 
-            _teams.AddUpdate(teamId, userId.Value, content.Trim(), status);
-            TempData["Success"] = "Update added.";
-            return RedirectToAction("Details", new { id = teamId });
+            return RedirectToAction("Details", "Teams", new { id = teamId });
+
         }
+
+
 
 
         // POST: /Teams/LeaderReview

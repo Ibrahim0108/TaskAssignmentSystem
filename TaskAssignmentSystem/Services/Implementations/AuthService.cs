@@ -101,5 +101,37 @@ namespace TaskAssignmentSystem.Services.Implementations
                 sb.Append(b.ToString("x2"));
             return sb.ToString();
         }
+
+        public bool Update(User user)
+        {
+            var existing = _db.Users.FirstOrDefault(u => u.Id == user.Id);
+            if (existing == null) return false;
+
+            existing.FullName = user.FullName;
+            existing.Email = user.Email;
+            existing.Department = user.Department;
+            existing.Year = user.Year;
+            existing.Section = user.Section;
+
+            _db.SaveChanges();
+            return true;
+        }
+
+        public List<Notification> GetNotifications(int userId) =>
+            _db.Notifications.Where(n => n.UserId == userId).OrderByDescending(n => n.CreatedAt).ToList();
+
+        public Notification? GetNotificationById(int id) =>
+            _db.Notifications.FirstOrDefault(n => n.Id == id);
+
+        public bool MarkNotificationAsRead(int id)
+        {
+            var notification = _db.Notifications.FirstOrDefault(n => n.Id == id);
+            if (notification == null) return false;
+            notification.IsRead = true;
+            _db.SaveChanges();
+            return true;
+        }
+
+
     }
 }

@@ -15,6 +15,8 @@ namespace TaskAssignmentSystem.Data
         public DbSet<TaskProgress> TaskProgresses { get; set; }
 
         public DbSet<User> Users => Set<User>();
+        public DbSet<Notification> Notifications => Set<Notification>();
+
         public DbSet<Workspace> Workspaces => Set<Workspace>();
 
         public DbSet<Team> Teams => Set<Team>();

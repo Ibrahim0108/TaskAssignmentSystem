@@ -10,6 +10,9 @@ namespace TaskAssignmentSystem.Services.Interfaces
         Team? GetByJoinCode(string code);
         bool JoinTeamByCode(string code, int userId);
         TeamProgressUpdate AddUpdate(int teamId, int userId, string content, SubtaskStatus status, int? assignedToUserId = null);
+        // new - update an existing (assigned) progress update (replace content/status)
+       TeamProgressUpdate UpdateExistingUpdate(int updateId, int userId, string content, TaskAssignmentSystem.Models.Teams.SubtaskStatus status);
+
         bool LeaderReviewUpdate(int teamId, int updateId, int leaderUserId);
         bool SubmitTeam(int teamId, int leaderUserId);
         bool Update(Team team);

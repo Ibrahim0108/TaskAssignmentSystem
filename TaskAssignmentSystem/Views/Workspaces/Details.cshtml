@@ -87,18 +87,27 @@
                                 @if (role == "Student")
                                 {
                                     <td>
-                                        <form method="post" asp-action="UpdateStatus" class="d-inline">
+                                        <form id="statusForm-@task.Id" method="post" asp-action="UpdateStatus" class="d-inline">
                                             <input type="hidden" name="taskId" value="@task.Id" />
-                                            <select name="status" class="form-select" required>
-                                                <option value="0" class="status-not-started">Not Started</option>
-                                                <option value="1" class="status-in-progress">In Progress</option>
-                                                <option value="2" class="status-completed">Completed</option>
-                                                <option value="3" class="status-blocked">Blocked</option>
-                                            </select>  
+                                            <select name="status" class="form-select status-select" required data-status="@task.Status">
+                                                <option value="0" class="status-not-started" selected="@(task.Status == 0)">
+                                                    Not Started
+                                                </option>
+                                                <option value="1" class="status-in-progress" selected="@(task.Status == 1)">
+                                                    In Progress
+                                                </option>
+                                                <option value="2" class="status-completed" selected="@(task.Status == 2)">
+                                                    Completed
+                                                </option>
+                                                <option value="3" class="status-blocked" selected="@(task.Status == 3)">
+                                                    Blocked
+                                                </option>
+                                            </select>
+
                                         </form>
 
                                     </td>
-                                     <td><button type="submit" class="btn btn-sm btn-primary">Save</button></td>
+                                    <td><button type="submit" form="statusForm-@task.Id"  class="btn btn-sm btn-primary">Save</button></td>
                                 }
                             </tr>
                         }
@@ -180,6 +189,7 @@
 
     .right-card {
         height: 500px;
+
     }
 
     .card-title {
@@ -274,19 +284,43 @@
     }
 
     .status-not-started {
-        color: #6b7280;
+        background-color: #e5e7eb;
+        color: #111827;
     }
 
     .status-in-progress {
-        color: #f59e0b;
+        background-color: #fef3c7;
+        color: #92400e;
     }
 
     .status-completed {
-        color: #22c55e;
+        background-color: #bbf7d0;
+        color: #14532d;
     }
 
     .status-blocked {
-        color: #ef4444;
+        background-color: #fecaca;
+        color: #991b1b;
+    }
+
+    .status-select[data-status="0"] {
+        background-color: #e5e7eb;
+        color: #111827;
+    }
+
+    .status-select[data-status="1"] {
+        background-color: #fef3c7;
+        color: #92400e;
+    }
+
+    .status-select[data-status="2"] {
+        background-color: #bbf7d0;
+        color: #14532d;
+    }
+
+    .status-select[data-status="3"] {
+        background-color: #fecaca;
+        color: #991b1b;
     }
 
     .btn-primary {
@@ -530,6 +564,13 @@
                 bar.style.width = width;
             }, 300);
         });
+
+
+            document.querySelectorAll('.status-select').forEach(sel => {
+        sel.addEventListener('change', function() {
+            this.setAttribute('data-status', this.value);
+        });
+    });
 
         // Task form submit
     // Intercept all task forms with data-confirm

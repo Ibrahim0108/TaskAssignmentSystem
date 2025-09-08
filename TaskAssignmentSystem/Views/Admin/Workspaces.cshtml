@@ -65,7 +65,10 @@
                                     <td>
                                         @if (isAdmin)
                                         {
-                                            <form method="post" asp-action="Restore" asp-controller="Admin" class="d-inline">
+                                            <form method="post" asp-action="Restore" asp-controller="Admin" class="d-inline"
+                                                  data-confirm="true"
+                                                  data-confirm-title="Restore Workspace"
+                                                  data-confirm-message="Are you sure you want to restore this workspace?">
                                                 <input type="hidden" name="id" value="@w.Id" />
                                                 <button class="btn btn-sm btn-success">Restore</button>
                                             </form>
@@ -614,3 +617,33 @@
             opacity: 0.5;
         }
 </style>
+
+
+    <script>
+            document.addEventListener('DOMContentLoaded', function() {
+        // Intercept all forms with data-confirm
+        document.querySelectorAll('form[data-confirm="true"]').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault(); // prevent immediate submit
+
+                const title = form.getAttribute('data-confirm-title') || 'Confirm';
+                const message = form.getAttribute('data-confirm-message') || 'Are you sure?';
+
+                // Call your existing custom modal function
+                showCustomConfirmModal(title, message).then(confirmed => {
+                    if (confirmed) {
+                        const submitBtn = form.querySelector('button[type="submit"]');
+                        if (submitBtn) {
+                            submitBtn.disabled = true;
+                            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Restoring...';
+                        }
+
+                        // Actually submit the form
+                        setTimeout(() => form.submit(), 200); // small delay for UI
+                    }
+                });
+            });
+        });
+    });
+
+    </script>

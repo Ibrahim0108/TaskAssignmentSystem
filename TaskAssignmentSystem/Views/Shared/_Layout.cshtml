@@ -389,6 +389,16 @@
                             <li class="nav-item">
                                 <a class="nav-link text-warning" href="@Url.Action("Logout", "Users")">Logout</a>
                             </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown">
+                                    Profile
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                                    <li><a class="dropdown-item" href="@Url.Action("ProfilePage", "Users")">View/Edit Profile</a></li>
+                                    <li><a class="dropdown-item" href="@Url.Action("NotificationsPage", "Users")">Notifications</a></li>
+                                </ul>
+                            </li>
+
                         }
                         else
                         {

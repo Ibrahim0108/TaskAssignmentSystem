@@ -59,11 +59,16 @@
                                     }
                                 </td>
                                 <td>
-                                    <form asp-action="Approve" asp-controller="Admin" method="post" class="d-inline">
+                                    <form asp-action="Approve" asp-controller="Admin" method="post" class="d-inline" data-confirm="true"
+                                          data-confirm-title="Approve User"
+                                          data-confirm-message="Are you sure you want to approve this user?">
                                         <input type="hidden" name="id" value="@u.Id" />
                                         <button class="btn btn-sm btn-success">Approve</button>
                                     </form>
-                                    <form asp-action="Reject" asp-controller="Admin" method="post" class="d-inline">
+                                    <form asp-action="Reject" asp-controller="Admin" method="post" class="d-inline"
+                                          data-confirm="true"
+                                          data-confirm-title="Reject User"
+                                          data-confirm-message="Are you sure you want to reject this user?">
                                         <input type="hidden" name="id" value="@u.Id" />
                                         <button class="btn btn-sm btn-outline-danger">Reject</button>
                                     </form>
@@ -112,7 +117,10 @@
                             </td>
                             <td>@(u.IsApproved ? "Yes" : "No")</td>
                             <td>
-                                <form asp-action="SetRole" asp-controller="Admin" method="post" class="d-flex gap-2">
+                                <form asp-action="SetRole" asp-controller="Admin" method="post" class="d-flex gap-2"
+                                      data-confirm="true"
+                                      data-confirm-title="Update User Role"
+                                      data-confirm-message="Are you sure you want to update this user’s role?">
                                     <input type="hidden" name="id" value="@u.Id" />
                                     <select name="role" class="form-select form-select-sm" style="max-width: 160px;">
                                         <option value="@Role.Admin" selected="@(u.Role == Role.Admin)">Admin</option>
@@ -803,6 +811,35 @@
 </style>
 
 <script>
+
+    // update confirm modal
+
+        document.addEventListener('DOMContentLoaded', function () {
+        // Intercept all forms with data-confirm
+        document.querySelectorAll('form[data-confirm="true"]').forEach(form => {
+            form.addEventListener('submit', function (e) {
+                e.preventDefault(); // stop default submit
+
+                const title = form.getAttribute('data-confirm-title') || 'Confirm';
+                const message = form.getAttribute('data-confirm-message') || 'Are you sure?';
+
+                // Trigger your existing confirm modal
+                showCustomConfirmModal(title, message).then(confirmed => {
+                    if (confirmed) {
+                        const btn = form.querySelector('button[type="submit"]');
+                        if (btn) {
+                            btn.disabled = true;
+                            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+                        }
+
+                        // Submit the form
+                        setTimeout(() => form.submit(), 300);
+                    }
+                });
+            });
+        });
+    });
+
     // Tab functionality
     document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
         tab.addEventListener('click', function(e) {
