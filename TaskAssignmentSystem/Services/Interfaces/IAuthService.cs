@@ -12,6 +12,9 @@ namespace TaskAssignmentSystem.Services.Interfaces
         // New names used by AdminController and implemented in AuthService
         List<User> GetPending();
         bool Approve(int userId);
+        void AddNotification(Notification notification);
+
+
         bool SetRole(int userId, Role role);
 
         bool Update(User user);

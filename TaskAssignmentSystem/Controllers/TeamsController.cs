@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using TaskAssignmentSystem.Data;
 using TaskAssignmentSystem.Models.Teams;
 using TaskAssignmentSystem.Models.Users;
 using TaskAssignmentSystem.Services.Interfaces;
@@ -10,12 +11,14 @@ namespace TaskAssignmentSystem.Controllers
         private readonly ITeamService _teams;
         private readonly IWorkspaceService _workspaces;
         private readonly IAuthService _auth;
+        private readonly ApplicationDbContext _db;
 
-        public TeamsController(ITeamService teams, IWorkspaceService workspaces, IAuthService auth)
+        public TeamsController(ApplicationDbContext db, ITeamService teams, IWorkspaceService workspaces, IAuthService auth)
         {
             _teams = teams;
             _workspaces = workspaces;
-            _auth = auth;  // <-- initialize
+            _auth = auth; 
+            _db = db;
         }
 
         // GET: /Teams/ForWorkspace/5
@@ -94,6 +97,19 @@ namespace TaskAssignmentSystem.Controllers
                 return View();
             }
             var t = _teams.CreateTeam(workspaceId, name.Trim(), leaderUserId, leaderType);
+
+            _db.Notifications.Add(new Notification
+            {
+                UserId = leaderUserId,
+                TeamId = t.Id,
+                WorkspaceId = workspaceId,
+                Message = $"You have been assigned as the leader of team '{t.Name}' in workspace '{t.WorkspaceId}'. " +
+              $"Join Code: {t.JoinCode}. " +
+              $"Click here to open: /Teams/Details/{t.Id}"
+            });
+            _db.SaveChanges();
+
+
             TempData["Success"] = $"Team '{t.Name}' created. Join Code: {t.JoinCode}";
             return RedirectToAction("ForWorkspace", new { id = workspaceId });
         }
@@ -323,6 +339,14 @@ namespace TaskAssignmentSystem.Controllers
             }
 
             _teams.AddUpdate(teamId, leaderId.Value, content.Trim(), SubtaskStatus.NotStarted, assignedToUserId);
+
+            _db.Notifications.Add(new Notification
+            {
+                UserId = assignedToUserId,
+                Message = $"You have been assigned a new task: {content}"
+            });
+            _db.SaveChanges();
+
 
             TempData["Success"] = "Task assigned successfully.";
             return RedirectToAction("Details", new { id = teamId });

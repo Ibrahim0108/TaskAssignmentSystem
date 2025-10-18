@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Notifications";
+var role = Context.Session.GetString("UserRole");
 }
 
 <div class="container">
@@ -14,6 +15,12 @@
                 <button class="btn btn-outline-secondary btn-sm" onclick="markAllAsRead()" style="border: 2px solid; outline: 2px solid #22c55e;">
                     ✅ Mark All Read
                 </button>
+                @if (role == "Teacher" || role == "Admin")
+                {
+                    <button class="btn btn-success btn-sm" onclick="openAnnouncementModal()" style="margin-left:10px;">
+                             📢 Make Announcement
+                     </button>
+               }
             </div>
         </div>
 
@@ -62,6 +69,8 @@
                     {
                         <tr class="@(n.IsRead ? "" : "table-warning")" data-status="@(n.IsRead ? "read" : "unread")" data-id="@n.Id">
                             <td>@(n.Message.Length > 50 ? n.Message.Substring(0, 50) + "..." : n.Message)</td>
+
+
                             <td>@n.CreatedAt.ToLocalTime()</td>
                             <td>
                                 <button class="btn btn-sm btn-primary" onclick="viewNotification(@n.Id)">
@@ -81,7 +90,7 @@
     <div class="modal-content">
         <div class="modal-header">
             <h5 class="modal-title">Notification Details</h5>
-            <button type="button" class="btn-close" onclick="closeModal()">✕</button>
+            <button type="button" class="btn-close" onclick="closeModal()"></button>
         </div>
         <div class="modal-body" id="notificationBody"></div>
         <div class="modal-footer">
@@ -95,29 +104,84 @@
     </div>
 </div>
 
+<!-- Announcement Modal -->
+<div id="announcementModal" class="modal-overlay" style="display:none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">Create Global Announcement</h5>
+            <button type="button" class="btn-close" onclick="closeAnnouncementModal()"></button>
+        </div>
+        <div class="modal-body">
+            <form id="announcementForm">
+                <div class="mb-3">
+                    <label class="form-label">Message</label>
+                    <textarea class="form-control" name="Message" required></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Year</label>
+                    <select class="form-control" name="Year" required>
+                        <option value="">Select Year</option>
+                        <option value="1">1st Year</option>
+                        <option value="2">2nd Year</option>
+                        <option value="3">3rd Year</option>
+                        <option value="4">4th Year</option>
+                    </select>
+                </div>
+                <!-- department can be derived from teacher’s profile in backend -->
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-success" onclick="submitAnnouncement()">✅ Announce</button>
+            <button type="button" class="btn btn-secondary" onclick="closeAnnouncementModal()">❌ Cancel</button>
+        </div>
+    </div>
+</div>
+
+
 @section Scripts {
     <script>
         let currentNotificationId = 0;
         let currentFilter = 'all';
 
-        function viewNotification(id) {
+                function viewNotification(id) {
             currentNotificationId = id;
 
             fetch(`/Users/GetNotificationById/${id}`)
-                .then(res => res.json())
+                .then(res => {
+                    if (!res.ok) throw new Error("Not found");
+                    return res.json();
+                })
                 .then(data => {
-                    document.getElementById('notificationBody').textContent = data.message;
+                                   let bodyHtml = data.message;
+        if (data.teamId) {
+            bodyHtml = `<a href="/Teams/Details/${data.teamId}">${data.message}</a>`;
+        } else if (data.workspaceId) {
+            bodyHtml = `<a href="/Workspaces/Details/${data.workspaceId}">${data.message}</a>`;
+        }
+        document.getElementById('notificationBody').innerHTML = bodyHtml;
 
-                    const row = document.querySelector(`tr[data-id="${id}"]`);
-                    const isRead = row.classList.contains('table-warning') === false;
 
-                    const markReadBtn = document.getElementById('markReadBtn');
-                    markReadBtn.style.display = isRead ? 'none' : 'inline-block';
+                    toggleModal(true, id);
+                })
+                .catch(err => {
+                    console.error(err);
 
-                    document.getElementById('notificationModal').style.display = 'flex';
-                    document.body.style.overflow = 'hidden';
+                    // fallback: show truncated message from table
+                    const row = document.querySelector(`tr[data-id="${id}"] td:first-child`);
+                    document.getElementById('notificationBody').textContent = row.textContent;
+                    toggleModal(true, id);
                 });
         }
+
+        function toggleModal(show, id) {
+            const row = document.querySelector(`tr[data-id="${id}"]`);
+            const isRead = row.classList.contains("table-warning") === false;
+
+            document.getElementById('markReadBtn').style.display = isRead ? 'none' : 'inline-block';
+            document.getElementById('notificationModal').style.display = show ? 'flex' : 'none';
+            document.body.style.overflow = show ? 'hidden' : 'auto';
+        }
+
 
         function closeModal() {
             document.getElementById('notificationModal').style.display = 'none';
@@ -170,6 +234,38 @@
                 row.style.display = (filter === 'all' || status === filter) ? '' : 'none';
             });
         }
+
+
+        function openAnnouncementModal() {
+    document.getElementById('announcementModal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeAnnouncementModal() {
+    document.getElementById('announcementModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+function submitAnnouncement() {
+    const form = document.getElementById('announcementForm');
+    const formData = new FormData(form);
+
+    fetch('/Users/CreateGlobalAnnouncement', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json()) 
+    .then(data => {
+        if (data.success) {
+            closeAnnouncementModal();
+        } else {
+                    closeAnnouncementModal();
+        }
+    })
+    .catch(err => console.error(err));
+}
+
+
 
         function updateStats() {
             const allRows = document.querySelectorAll('#notificationsTable tr');

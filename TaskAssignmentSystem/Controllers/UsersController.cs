@@ -129,6 +129,85 @@ namespace TaskAssignmentSystem.Controllers
             return View(notifications);
         }
 
+        [HttpGet]
+        public IActionResult GetNotificationById(int id)
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null) return Unauthorized();
+
+            var notification = _auth.GetNotificationById(id);
+
+            if (notification == null || notification.UserId != userId.Value)
+                return NotFound();
+
+            return Json(new
+            {
+                id = notification.Id,
+                message = notification.Message,
+                isRead = notification.IsRead,
+                createdAt = notification.CreatedAt.ToString("f") // formatted date
+            });
+        }
+
+
+        [HttpPost]
+        public IActionResult MarkNotificationRead(int id)
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null) return Unauthorized();
+
+            var notif = _auth.GetNotificationById(id);
+            if (notif == null || notif.UserId != userId.Value)
+                return NotFound();
+
+            var success = _auth.MarkNotificationAsRead(id);
+            return Json(new { success });
+        }
+
+        [HttpPost]
+        public IActionResult MarkAllNotificationsRead()
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null) return Unauthorized();
+
+            var notifications = _auth.GetNotifications(userId.Value);
+            foreach (var n in notifications.Where(n => !n.IsRead))
+                _auth.MarkNotificationAsRead(n.Id);
+
+            return Json(new { success = true });
+        }
+
+
+        [HttpPost]
+        public IActionResult CreateGlobalAnnouncement(string message, int year)
+        {
+            var teacherId = HttpContext.Session.GetInt32("UserId");
+            if (teacherId == null) return Unauthorized();
+
+            var teacher = _auth.GetById(teacherId.Value);
+            if (teacher == null) return Unauthorized();
+
+            // Get all students in the same department & year
+            var students = _auth.GetAll()
+                .Where(u => u.Role == Role.Student
+                         && u.Department == teacher.Department
+                         && u.Year == year)
+                .ToList();
+
+            // Insert notifications for each student
+            foreach (var s in students)
+            {
+                _auth.AddNotification(new Notification
+                {
+                    UserId = s.Id,
+                    Message = message,
+                    CreatedAt = DateTime.Now
+                });
+            }
+
+            TempData["Success"] = "Announcement sent successfully!";
+            return Json(new { success = true });
+        }
 
     }
 }

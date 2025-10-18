@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using TaskAssignmentSystem.Data;
 using TaskAssignmentSystem.Models.Task;
+using TaskAssignmentSystem.Models.Users;
 using TaskAssignmentSystem.Models.Workspaces;
 using TaskAssignmentSystem.Services.Implementations;
 using TaskAssignmentSystem.Services.Interfaces;
@@ -12,13 +14,15 @@ namespace TaskAssignmentSystem.Controllers
         private readonly IAuthService _auth;
         private readonly ITeamService _teamService;
         private readonly ITaskService _taskService;
+        private readonly ApplicationDbContext _db;
 
-        public WorkspacesController(ITaskService taskService,IWorkspaceService workspaces, IAuthService auth, ITeamService teamService)
+        public WorkspacesController(ApplicationDbContext db, ITaskService taskService,IWorkspaceService workspaces, IAuthService auth, ITeamService teamService)
         {
             _workspaces = workspaces;
             _auth = auth;
             _teamService = teamService;
             _taskService = taskService;
+            _db = db;
         }
 
         public IActionResult Index()
@@ -203,7 +207,24 @@ namespace TaskAssignmentSystem.Controllers
             var ws = _workspaces.GetById(workspaceId);
             if (ws == null) return NotFound();
 
-            _taskService.AssignTask(workspaceId, title, description);
+            var task = _taskService.AssignTask(workspaceId, title, description);
+
+            // Create notifications for all workspace members
+            foreach (var memberId in ws.MemberUserIds)
+            {
+                var notification = new Notification
+                {
+                    UserId = memberId,
+                    WorkspaceId = workspaceId,
+                    Message = $" New task \"{task.Title}\" has been assigned in workspace \"{ws.Name}\".",
+                    IsRead = false,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                _db.Notifications.Add(notification);
+            }
+
+            _db.SaveChanges();
 
             TempData["Success"] = "Task assigned successfully.";
             return RedirectToAction("Details", new { id = workspaceId });

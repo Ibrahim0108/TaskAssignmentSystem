@@ -133,5 +133,12 @@ namespace TaskAssignmentSystem.Services.Implementations
         }
 
 
+        public void AddNotification(Notification notification)
+        {
+            _db.Notifications.Add(notification);
+            _db.SaveChanges();
+        }
+
+
     }
 }
