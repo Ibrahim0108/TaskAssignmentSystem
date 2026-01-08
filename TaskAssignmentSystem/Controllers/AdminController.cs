@@ -35,8 +35,8 @@ namespace TaskAssignmentSystem.Controllers
             var pendingUsers = _context.Users.Count(u => !u.IsApproved);
 
             // if you don’t have workspaces yet, keep these 0 or adjust later
-            var activeWorkspaces = 0;
-            var inactiveWorkspaces = 0;
+            var activeWorkspaces = _context.Workspaces.Count(w => w.IsActive); 
+            var inactiveWorkspaces = _context.Workspaces.Count(w => !w.IsActive);
 
             var dashboardData = new
             {
